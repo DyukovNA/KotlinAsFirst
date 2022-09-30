@@ -75,7 +75,7 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  */
 fun digitNumber(n: Int): Int {
     var cnt = 0
-    var num = n
+    var num = abs(n)
     do {
         num /= 10
         cnt++
@@ -176,11 +176,17 @@ fun collatzSteps(x: Int): Int {
  * минимальное число k, которое делится и на m и на n без остатка
  */
 fun lcm(m: Int, n: Int): Int {
-    var grt = max(m, n)
-    while (!((grt % m == 0) && (grt % n == 0))) {
-        grt++
+    var a = m
+    var b = n
+    var ans = max(m, n)
+    while (a != b) {
+        if (a > b) a -= b
+        else b -= a
     }
-    return grt
+    while (!((ans % m == 0) && (ans % n == 0))) {
+        ans += a
+    }
+    return ans
 }
 
 /**
@@ -191,12 +197,16 @@ fun lcm(m: Int, n: Int): Int {
  * Например, 25 и 49 взаимно простые, а 6 и 8 -- нет.
  */
 fun isCoPrime(m: Int, n: Int): Boolean {
-    var isIt = false
-    for (i in 2..(max(m, n) / 2)) {
-        isIt = ((m % i == 0) && (n % i == 0)).not()
-        if (!isIt) break
+    var a = m
+    var b = n
+    while (a != b) {
+        if (a > b) a -= b
+        else b -= a
     }
-    return isIt
+    return when {
+        (m != 1) && (n != 1) -> a == 1
+        else -> true
+    }
 }
 
 /**
@@ -227,7 +237,7 @@ fun revert(n: Int): Int {
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun isPalindrome(n: Int): Boolean = (n == revert(n))
+fun isPalindrome(n: Int): Boolean = n == revert(n)
 
 /**
  * Средняя (3 балла)
@@ -251,10 +261,7 @@ fun hasDifferentDigits(n: Int): Boolean {
             num /= 10
         }
     }
-    return when {
-        hasIt -> true
-        else -> false
-    }
+    return hasIt
 
 }
 
@@ -320,7 +327,7 @@ fun squareSequenceDigit(n: Int): Int {
     var num = 1
     var seq: Int
     var len = 0
-    var ans = 99999
+    var ans = Int.MAX_VALUE
     do {
         seq = sqr(num)
         num++
