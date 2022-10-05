@@ -89,9 +89,8 @@ fun digitNumber(n: Int): Int {
  * Найти число Фибоначчи из ряда 1, 1, 2, 3, 5, 8, 13, 21, ... с номером n.
  * Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
  */
-fun fib(n: Int): Int {
-    return if ((n == 1) || (n == 2)) 1
-    else if (n > 2) {
+fun fib(n: Int): Int = when {
+    (n > 2) -> {
         var a = 1
         var b = 1
         var res = 0
@@ -103,7 +102,10 @@ fun fib(n: Int): Int {
             num -= 1
         }
         res
-    } else 0
+    }
+
+    (n == 1) || (n == 2) -> 1
+    else -> 0
 }
 
 /**
@@ -112,17 +114,10 @@ fun fib(n: Int): Int {
  * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
  */
 fun minDivisor(n: Int): Int {
-    var divisor = 0
     for (i in 2..(sqrt(n.toDouble())).toInt() + 1) {
-        if (n % i == 0) {
-            divisor = i
-            break
-        }
+        if (n % i == 0) return i
     }
-    return when {
-        divisor != 0 -> divisor
-        else -> n
-    }
+    return n
 }
 
 /**
@@ -178,15 +173,11 @@ fun collatzSteps(x: Int): Int {
 fun lcm(m: Int, n: Int): Int {
     var a = m
     var b = n
-    var ans = max(m, n)
     while (a != b) {
         if (a > b) a -= b
         else b -= a
     }
-    while (!((ans % m == 0) && (ans % n == 0))) {
-        ans += a
-    }
-    return ans
+    return (m * n) / a
 }
 
 /**
