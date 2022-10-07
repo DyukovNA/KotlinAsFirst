@@ -3,6 +3,7 @@
 package lesson4.task1
 
 import lesson1.task1.discriminant
+import lesson3.task1.digitNumber
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.reflect.typeOf
@@ -297,7 +298,7 @@ fun decimalFromString(str: String, base: Int): Int {
     var s = 0
     val num = str.reversed()
     for (i in num.indices) {
-        if (num[i].isDigit()) s += num[i].toString().toInt() * base.toDouble().pow(i).toInt()
+        if (num[i].isDigit()) s += num[i].digitToInt() * base.toDouble().pow(i).toInt()
         else s += (alphabet.indexOf(num[i].toString()) + 10) * base.toDouble().pow(i).toInt()
     }
     return s
@@ -335,39 +336,107 @@ fun roman(n: Int): String {
  * Например, 375 = "триста семьдесят пять",
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
-fun russian(n: Int): String = TODO()
-/**
+fun russian(n: Int): String {
     val hundreds = listOf<String>(
-        "", "сто", "двести", "триста", "четыреста",
+        "сто", "двести", "триста", "четыреста",
         "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот"
     )
     val decimals = listOf<String>(
-        "", "двадцать", "тридцать", "сорок", "пятьдесятя", "шестьдесят",
+        "двадцать", "тридцать", "сорок", "пятьдесятя", "шестьдесят",
         "семьдесят", "восемьдесят", " девяносто"
     )
     val elementary = listOf<String>(
-        "", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять", "десять", "одиннадцать",
+        "", "ноль", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять", "десять", "одиннадцать",
         "двенадцать", "тринадцать", "четырнадцать", "пятнадцать", "шестнадцать", "семнадцать", "восемнадцать",
-        "девятнадцать"
+        "девятнадцать", "двадцать"
     )
-    val thousands = listOf<String>(
-        "тысяча", "тысяч", "тысячи"
-    )
-    val od = listOf<String>("одна", "две")
-    val divisors = listOf<Int>(1000, 100, 10)
 
     var num = n
     var s = ""
-    var i = 0 //0,1,2 сто десять один
+    var len = num.toString().length
+    return when {
+        num <= 20 -> elementary[num + 1]
+        else -> {
+            var a = 0
+            var i = 0
+            var check = false
+            var isMoreThanThousand = false
+            while (len > 0) {
+                if (num > 1000) {
+                    a = num / 1000
+                    isMoreThanThousand = true
+                } else a = num
+                num %= 1000
 
-    /**s += hundreds[num / 100000] + " "
-    num %= 100000
-    s += decimals[num / 10000] + " "
-    num %= 10000
-    s += elementary[num / 1000] + " "
-    num %= 1000
-    s += hundreds[num / 100] + " "
-    num %= 100
-    s += elementary[num / 10] + " "
-    return s*/
-}*/
+                if (len <= 3) {
+                    when {
+                        a == 0 -> s
+                        digitNumber(a) == 1 -> s += elementary[a + 1]
+                        (digitNumber(a) == 2) && (a <= 20) -> s += elementary[a + 1] + " "
+                        (digitNumber(a) == 2) && (a > 20) ->
+                            s += decimals[a / 10 - 2] + " " + elementary[a % 10 + 1] + " "
+
+                        (digitNumber(a) == 3) && (a % 100 < 20) ->
+                            s += hundreds[a / 100 - 1] + " " + elementary[a % 100 + 1] + " "
+
+                        (digitNumber(a) == 3) && (a % 100 > 20) ->
+                            s += hundreds[a / 100 - 1] + " " + decimals[(a % 100) / 10 - 2] + " " +
+                                    elementary[a % 10 + 1] + " "
+                    }
+                    i++
+                } else {
+                    when {
+                        a == 1 -> s += "одна "
+                        a == 2 -> s += "две "
+                        digitNumber(a) == 1 -> s += elementary[a + 1]
+                        (digitNumber(a) == 2) && (a <= 20) -> s += elementary[a + 1] + " "
+                        (digitNumber(a) == 2) && (a > 20) && (a % 10 == 1) ->
+                            s += decimals[a / 10 - 2] + " " + "одна "
+
+                        (digitNumber(a) == 2) && (a > 20) && (a % 10 == 2) ->
+                            s += decimals[a / 10 - 2] + " " + "две "
+
+                        (digitNumber(a) == 2) && (a > 20) ->
+                            s += decimals[a / 10 - 2] + " " + elementary[a % 10 + 1] + " "
+
+                        (digitNumber(a) == 3) && (a % 100 == 0) -> s += hundreds[a / 100 - 1] + " "
+
+                        (digitNumber(a) == 3) && (a % 100 <= 20) ->
+                            s += hundreds[a / 100 - 1] + " " + elementary[a % 100 + 1] + " "
+
+                        (digitNumber(a) == 3) && (a % 100 > 20) && (a % 10 == 1) ->
+                            s += hundreds[a / 100 - 1] + " " + decimals[(a % 100) / 10 - 2] + " " +
+                                    "одна "
+
+                        (digitNumber(a) == 3) && (a % 100 > 20) && (a % 10 == 2) ->
+                            s += hundreds[a / 100 - 1] + " " + decimals[(a % 100) / 10 - 2] + " " +
+                                    "две "
+
+                        (digitNumber(a) == 3) && (a % 100 > 20) ->
+                            s += hundreds[a / 100 - 1] + " " + decimals[(a % 100) / 10 - 2] + " " +
+                                    elementary[a % 10 + 1] + " "
+
+                    }
+                    i++
+                    check = true
+                }
+                len -= digitNumber(a)
+                if (check && s != "") {
+                    val end = a % 100
+                    when {
+                        (end <= 20) && (end > 4) -> s += "тысяч "
+                        end % 10 == 1 -> s += "тысяча "
+                        end % 10 in 2..4 -> s += "тысячи "
+                        (end % 10 in 5..10) || (end % 10 == 0) -> s += "тысяч "
+                        //1  тысяча
+                        // 2 3 4 тысячи
+                        // 5678910 тысчяч
+                    }
+                    check = false
+                }
+                if ((i == 2 && isMoreThanThousand) || (i == 1 && !isMoreThanThousand)) break
+            }
+            s.trim()
+        }
+    }
+}
