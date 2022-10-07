@@ -420,6 +420,8 @@ fun russian(n: Int): String {
                             s += decimals[a / 10 - 2] + " " + elementary[a % 10 + 1] + " "
 
                         (digitNumber(a) == 3) && (a % 100 == 0) -> s += hundreds[a / 100 - 1] + " "
+                        (digitNumber(a) == 3) && (a % 100 == 1) -> s += hundreds[a / 100 - 1] + "одна "
+                        (digitNumber(a) == 3) && (a % 100 == 2) -> s += hundreds[a / 100 - 1] + "две "
 
                         (digitNumber(a) == 3) && (a % 100 <= 20) ->
                             s += hundreds[a / 100 - 1] + " " + elementary[a % 100 + 1] + " "
