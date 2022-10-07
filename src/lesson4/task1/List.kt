@@ -424,6 +424,9 @@ fun russian(n: Int): String {
                         (digitNumber(a) == 3) && (a % 100 <= 20) ->
                             s += hundreds[a / 100 - 1] + " " + elementary[a % 100 + 1] + " "
 
+                        (digitNumber(a) == 3) && (a % 100 <= 20) && (a % 10 == 0) ->
+                            s += hundreds[a / 100 - 1] + " "
+
                         (digitNumber(a) == 3) && (a % 100 > 20) && (a % 10 == 1) ->
                             s += hundreds[a / 100 - 1] + " " + decimals[(a % 100) / 10 - 2] + " " +
                                     "одна "
@@ -435,6 +438,9 @@ fun russian(n: Int): String {
                         (digitNumber(a) == 3) && (a % 100 > 20) ->
                             s += hundreds[a / 100 - 1] + " " + decimals[(a % 100) / 10 - 2] + " " +
                                     elementary[a % 10 + 1] + " "
+
+                        (digitNumber(a) == 3) && (a % 100 > 20) && (a % 10 == 0) ->
+                            s += hundreds[a / 100 - 1] + " " + decimals[(a % 100) / 10 - 2] + " "
 
                     }
                     i++
