@@ -230,11 +230,20 @@ fun factorizeToString(n: Int): String = factorize(n).joinToString(separator = "*
 fun convert(n: Int, base: Int): List<Int> {
     var list = mutableListOf<Int>()
     var num = n
-    while (num > 0) {
-        list.add(num % base)
-        num /= base
+    return when {
+        n == 0 -> {
+            list.add(0)
+            list
+        }
+
+        else -> {
+            while (num > 0) {
+                list.add(num % base)
+                num /= base
+            }
+            list.reversed()
+        }
     }
-    return list.reversed()
 }
 
 /**
@@ -255,11 +264,16 @@ fun convertToString(n: Int, base: Int): String {
     )
     var nums = convert(n, base).toMutableList()
     var s = ""
-    for (i in nums.indices) {
-        if (nums[i] < 10) s += nums[i].toString()
-        else s += alphabet[nums[i] - 10]
+    return when {
+        n == 0 -> "0"
+        else -> {
+            for (i in nums.indices) {
+                if (nums[i] < 10) s += nums[i].toString()
+                else s += alphabet[nums[i] - 10]
+            }
+            s
+        }
     }
-    return s
 }
 
 /**
