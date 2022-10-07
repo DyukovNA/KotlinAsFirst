@@ -408,7 +408,7 @@ fun russian(n: Int): String {
                     when {
                         a == 1 -> s += "одна "
                         a == 2 -> s += "две "
-                        digitNumber(a) == 1 -> s += elementary[a + 1]
+                        digitNumber(a) == 1 -> s += elementary[a + 1] + " "
                         (digitNumber(a) == 2) && (a <= 20) -> s += elementary[a + 1] + " "
                         (digitNumber(a) == 2) && (a > 20) && (a % 10 == 1) ->
                             s += decimals[a / 10 - 2] + " " + "одна "
