@@ -356,7 +356,7 @@ fun russian(n: Int): String {
         "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот"
     )
     val decimals = listOf<String>(
-        "двадцать", "тридцать", "сорок", "пятьдесятя", "шестьдесят",
+        "двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят",
         "семьдесят", "восемьдесят", " девяносто"
     )
     val elementary = listOf<String>(
@@ -387,15 +387,21 @@ fun russian(n: Int): String {
                         a == 0 -> s
                         digitNumber(a) == 1 -> s += elementary[a + 1]
                         (digitNumber(a) == 2) && (a <= 20) -> s += elementary[a + 1] + " "
-                        (digitNumber(a) == 2) && (a > 20) ->
+                        (digitNumber(a) == 2) && (a > 20) && (a % 10 != 0) ->
                             s += decimals[a / 10 - 2] + " " + elementary[a % 10 + 1] + " "
 
-                        (digitNumber(a) == 3) && (a % 100 < 20) ->
+                        (digitNumber(a) == 2) && (a > 20) && (a % 10 == 0) ->
+                            s += decimals[a / 10 - 2] + " "
+
+                        (digitNumber(a) == 3) && (a % 100 <= 20) ->
                             s += hundreds[a / 100 - 1] + " " + elementary[a % 100 + 1] + " "
 
-                        (digitNumber(a) == 3) && (a % 100 > 20) ->
+                        (digitNumber(a) == 3) && (a % 100 > 20) && (a % 10 != 0) ->
                             s += hundreds[a / 100 - 1] + " " + decimals[(a % 100) / 10 - 2] + " " +
                                     elementary[a % 10 + 1] + " "
+
+                        (digitNumber(a) == 3) && (a % 100 > 20) && (a % 10 == 0) ->
+                            s += hundreds[a / 100 - 1] + " " + decimals[(a % 100) / 10 - 2] + " "
                     }
                     i++
                 } else {
