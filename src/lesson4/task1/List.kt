@@ -198,7 +198,7 @@ fun accumulate(list: MutableList<Int>): MutableList<Int> {
  * Множители в списке должны располагаться по возрастанию.
  */
 fun factorize(n: Int): List<Int> {
-    var list = mutableListOf<Int>()
+    val list = mutableListOf<Int>()
     var num = n
     var divisor = 2
     while (num != 1) {
@@ -228,7 +228,7 @@ fun factorizeToString(n: Int): String = factorize(n).joinToString(separator = "*
  * например: n = 100, base = 4 -> (1, 2, 1, 0) или n = 250, base = 14 -> (1, 3, 12)
  */
 fun convert(n: Int, base: Int): List<Int> {
-    var list = mutableListOf<Int>()
+    val list = mutableListOf<Int>()
     var num = n
     return when {
         n == 0 -> {
@@ -258,18 +258,14 @@ fun convert(n: Int, base: Int): List<Int> {
  * (например, n.toString(base) и подобные), запрещается.
  */
 fun convertToString(n: Int, base: Int): String {
-    val alphabet = listOf<String>(
-        "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q",
-        "r", "s", "t", "u", "v", "w", "x", "y", "z"
-    )
-    var nums = convert(n, base).toMutableList()
-    var s = ""
+    val nums = convert(n, base)
+    var s = StringBuilder().toString()
     return when {
         n == 0 -> "0"
         else -> {
             for (i in nums.indices) {
                 if (nums[i] < 10) s += nums[i].toString()
-                else s += alphabet[nums[i] - 10]
+                else s += ('a' + (nums[i] - 10)).toString()
             }
             s
         }
@@ -305,7 +301,7 @@ fun decimal(digits: List<Int>, base: Int): Int {
  * (например, str.toInt(base)), запрещается.
  */
 fun decimalFromString(str: String, base: Int): Int {
-    val alphabet = listOf<String>(
+    val alphabet = listOf(
         "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q",
         "r", "s", "t", "u", "v", "w", "x", "y", "z"
     )
@@ -327,11 +323,11 @@ fun decimalFromString(str: String, base: Int): Int {
  * Например: 23 = XXIII, 44 = XLIV, 100 = C
  */
 fun roman(n: Int): String {
-    val alphabet = listOf<String>("I", "IV", "V", "IX", "X", "XL", "L", "XC", "C", "CD", "D", "CM", "M")
-    val divs = listOf<Int>(1, 4, 5, 9, 10, 40, 50, 90, 100, 400, 500, 900, 1000)
+    val alphabet = listOf("I", "IV", "V", "IX", "X", "XL", "L", "XC", "C", "CD", "D", "CM", "M")
+    val divs = listOf(1, 4, 5, 9, 10, 40, 50, 90, 100, 400, 500, 900, 1000)
     var num = n
-    var i = 12
-    var s = ""
+    var i = divs.size - 1
+    var s = StringBuilder().toString()
     do {
         if (num / divs[i] > 0) {
             s += alphabet[i].repeat(num / divs[i])
@@ -360,9 +356,28 @@ fun russian(n: Int): String {
         "семьдесят", "восемьдесят", "девяносто"
     )
     val elementary = listOf<String>(
-        "", "ноль", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять", "десять", "одиннадцать",
-        "двенадцать", "тринадцать", "четырнадцать", "пятнадцать", "шестнадцать", "семнадцать", "восемнадцать",
-        "девятнадцать", "двадцать"
+        "",
+        "ноль",
+        "один",
+        "два",
+        "три",
+        "четыре",
+        "пять",
+        "шесть",
+        "семь",
+        "восемь",
+        "девять",
+        "десять",
+        "одиннадцать",
+        "двенадцать",
+        "тринадцать",
+        "четырнадцать",
+        "пятнадцать",
+        "шестнадцать",
+        "семнадцать",
+        "восемнадцать",
+        "девятнадцать",
+        "двадцать"
     )
 
     var num = n
@@ -420,8 +435,8 @@ fun russian(n: Int): String {
                             s += decimals[a / 10 - 2] + " " + elementary[a % 10 + 1] + " "
 
                         (digitNumber(a) == 3) && (a % 100 == 0) -> s += hundreds[a / 100 - 1] + " "
-                        (digitNumber(a) == 3) && (a % 100 == 1) -> s += hundreds[a / 100 - 1] + "одна "
-                        (digitNumber(a) == 3) && (a % 100 == 2) -> s += hundreds[a / 100 - 1] + "две "
+                        (digitNumber(a) == 3) && (a % 100 == 1) -> s += hundreds[a / 100 - 1] + " одна "
+                        (digitNumber(a) == 3) && (a % 100 == 2) -> s += hundreds[a / 100 - 1] + " две "
 
                         (digitNumber(a) == 3) && (a % 100 <= 20) ->
                             s += hundreds[a / 100 - 1] + " " + elementary[a % 100 + 1] + " "
