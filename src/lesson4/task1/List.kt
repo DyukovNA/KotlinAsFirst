@@ -171,9 +171,10 @@ fun times(a: List<Int>, b: List<Int>): Int {
  */
 fun polynom(p: List<Int>, x: Int): Int {
     var s = 0
-    for (i in p.indices) s += p[i] * x.toDouble().pow(i).toInt()
+    p.forEachIndexed { i, a -> s += (a * x.toDouble().pow(i)).toInt() }
     return s
 }
+
 
 /**
  * Средняя (3 балла)
@@ -230,20 +231,16 @@ fun factorizeToString(n: Int): String = factorize(n).joinToString(separator = "*
 fun convert(n: Int, base: Int): List<Int> {
     val list = mutableListOf<Int>()
     var num = n
-    return when {
-        n == 0 -> {
-            list.add(0)
-            list
+    if (n == 0) {
+        list.add(0)
+    } else {
+        while (num > 0) {
+            list.add(num % base)
+            num /= base
         }
-
-        else -> {
-            while (num > 0) {
-                list.add(num % base)
-                num /= base
-            }
-            list.reversed()
-        }
+        list.reverse()
     }
+    return list
 }
 
 /**
@@ -259,15 +256,15 @@ fun convert(n: Int, base: Int): List<Int> {
  */
 fun convertToString(n: Int, base: Int): String {
     val nums = convert(n, base)
-    var s = StringBuilder().toString()
+    val s = StringBuilder()
     return when {
         n == 0 -> "0"
         else -> {
             for (i in nums.indices) {
-                if (nums[i] < 10) s += nums[i].toString()
-                else s += ('a' + (nums[i] - 10)).toString()
+                if (nums[i] < 10) s.append(nums[i])
+                else s.append('a' + (nums[i] - 10))
             }
-            s
+            s.toString()
         }
     }
 }
@@ -301,15 +298,11 @@ fun decimal(digits: List<Int>, base: Int): Int {
  * (например, str.toInt(base)), запрещается.
  */
 fun decimalFromString(str: String, base: Int): Int {
-    val alphabet = listOf(
-        "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q",
-        "r", "s", "t", "u", "v", "w", "x", "y", "z"
-    )
     var s = 0
     val num = str.reversed()
     for (i in num.indices) {
-        if (num[i].isDigit()) s += num[i].digitToInt() * base.toDouble().pow(i).toInt()
-        else s += (alphabet.indexOf(num[i].toString()) + 10) * base.toDouble().pow(i).toInt()
+        s += if (num[i].isDigit()) num[i].digitToInt() * base.toDouble().pow(i).toInt()
+        else (num[i] + 10 - 'a') * base.toDouble().pow(i).toInt()
     }
     return s
 }
@@ -348,36 +341,15 @@ fun roman(n: Int): String {
  */
 fun russian(n: Int): String {
     val hundreds = listOf<String>(
-        "сто", "двести", "триста", "четыреста",
-        "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот"
+        "сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот"
     )
     val decimals = listOf<String>(
-        "двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят",
-        "семьдесят", "восемьдесят", "девяносто"
+        "двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят", "семьдесят", "восемьдесят", "девяносто"
     )
     val elementary = listOf<String>(
-        "",
-        "ноль",
-        "один",
-        "два",
-        "три",
-        "четыре",
-        "пять",
-        "шесть",
-        "семь",
-        "восемь",
-        "девять",
-        "десять",
-        "одиннадцать",
-        "двенадцать",
-        "тринадцать",
-        "четырнадцать",
-        "пятнадцать",
-        "шестнадцать",
-        "семнадцать",
-        "восемнадцать",
-        "девятнадцать",
-        "двадцать"
+        "", "", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять", "десять", "одиннадцать",
+        "двенадцать", "тринадцать", "четырнадцать", "пятнадцать", "шестнадцать", "семнадцать", "восемнадцать",
+        "девятнадцать", "двадцать"
     )
 
     var num = n

@@ -189,10 +189,7 @@ fun lcm(m: Int, n: Int): Int = (m * n) / gcd(m, n)
  * Взаимно простые числа не имеют общих делителей, кроме 1.
  * Например, 25 и 49 взаимно простые, а 6 и 8 -- нет.
  */
-fun isCoPrime(m: Int, n: Int): Boolean = when {
-    (m != 1) && (n != 1) -> gcd(m, n) == 1
-    else -> true
-}
+fun isCoPrime(m: Int, n: Int): Boolean = gcd(m, n) == 1
 
 
 /**
