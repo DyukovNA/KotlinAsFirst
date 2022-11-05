@@ -3,6 +3,8 @@
 package lesson5.task1
 
 import lesson4.task1.mean
+import ru.spbstu.wheels.NullableMonad.filter
+import kotlin.math.max
 import kotlin.math.min
 
 // Урок 5: ассоциативные массивы и множества
@@ -108,7 +110,6 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
         }
     }
     return namesToGrades
-
 }
 
 /**
@@ -121,20 +122,7 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "z", "b" to "sweet")) -> true
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")) -> false
  */
-fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
-    var isIn = false
-    for ((a_key, a_value) in a) {
-        isIn = false
-        for ((b_key, b_value) in b) {
-            if (a_key == b_key && a_value == b_value) {
-                isIn = true
-                break
-            }
-        }
-        if (!isIn) break
-    }
-    return isIn
-}
+fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean = a.all { x -> b.any { y -> x == y } }
 
 /**
  * Простая (2 балла)
@@ -173,7 +161,7 @@ fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>): MutableMa
  */
 fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
     val inBoth = mutableListOf<String>()
-    for (name in a) if (b.contains(name) && !inBoth.contains(name)) inBoth.add(name)
+    a.forEach { name -> if (b.contains(name) && !inBoth.contains(name)) inBoth.add(name) }
     return inBoth
 }
 
@@ -266,15 +254,7 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  * Например:
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
-fun canBuildFrom(chars: List<Char>, word: String): Boolean {
-    val charsInWord = mutableListOf<Char>()
-    for (char in word) charsInWord.add(char)
-    return when {
-        chars.isEmpty() -> false
-        (chars.all { it in charsInWord }) -> true
-        else -> false
-    }
-}
+fun canBuildFrom(chars: List<Char>, word: String): Boolean = word.toSet() == chars.toSet()
 
 /**
  * Средняя (4 балла)
@@ -359,7 +339,17 @@ fun hasAnagrams(words: List<String>): Boolean {
  *          "GoodGnome" to setOf()
  *        )
  */
-fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> = TODO()
+fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> {
+    val people = friends.toMutableMap()
+    friends.forEach { (_, ff) -> ff.forEach { if (!people.contains(it)) people += Pair(it, emptySet()) } }
+    val ans = mutableMapOf<String, MutableSet<String>>()
+    for ((name, ff) in people) {
+        val handshakes = ff.toMutableSet()
+        ff.forEach { a -> people.forEach { (b, list) -> if (a == b) list.forEach { if (it != name) handshakes.add(it) } } }
+        ans += Pair(name, handshakes)
+    }
+    return ans
+}
 
 /**
  * Сложная (6 баллов)
@@ -378,7 +368,14 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 4) -> Pair(0, 2)
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
-fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> = TODO()
+fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
+    var ans = Pair(-1, -1)
+    list.reversed().forEach {
+        if (number >= it && list.contains(number - it) && list.indexOf(it) != list.indexOf(number - it))
+            ans = Pair(list.indexOf(it), list.indexOf(number - it))
+    }
+    return ans
+}
 
 /**
  * Очень сложная (8 баллов)
@@ -402,15 +399,27 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> = TODO()
  *   ) -> emptySet()
  */
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
-    val sortedTreasures = treasures.toList().sortedWith(compareByDescending<Pair<String, Pair<Int, Int>>>
-    { it.second.second }.thenBy { it.second.first }).toMap()
-    var sum = capacity
-    val ans = mutableSetOf<String>()
-    for ((name, stats) in sortedTreasures) {
-        if (sum >= stats.first) {
-            ans.add(name)
-            sum -= stats.first
+    val am = treasures.size
+    val value = MutableList(am + 1) { MutableList(capacity + 1) { Pair<Int, MutableList<String>>(0, mutableListOf()) } }
+    var item = 0
+
+    for ((name, stats) in treasures) {
+        item++
+        for (cap in 1..capacity) {
+            val maxValWithoutCur = value[item - 1][cap].first
+            var maxValWithCur = 0
+            val weight = stats.first
+
+            if (cap >= weight) maxValWithCur += stats.second + value[item - 1][cap - weight].first
+
+            if (maxValWithCur >= maxValWithoutCur && cap >= weight) {
+                val ans = (value[item][cap].second + name + value[item - 1][cap - weight].second).toMutableList()
+                value[item][cap] = Pair(maxValWithCur, ans)
+            } else {
+                val ans = value[item - 1][cap].second
+                value[item][cap] = Pair(maxValWithoutCur, ans)
+            }
         }
     }
-    return ans
+    return value[am][capacity].second.toSet()
 }

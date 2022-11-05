@@ -121,6 +121,7 @@ class Tests {
     @Test
     @Tag("2")
     fun containsIn() {
+        assertTrue(containsIn(mapOf(), mapOf()))
         assertTrue(containsIn(mapOf("a" to "z"), mapOf("a" to "z", "b" to "sweet")))
         assertFalse(containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")))
     }
@@ -232,6 +233,7 @@ class Tests {
     @Test
     @Tag("3")
     fun canBuildFrom() {
+        assertTrue(canBuildFrom(emptyList(), ""))
         assertFalse(canBuildFrom(emptyList(), "foo"))
         assertTrue(canBuildFrom(listOf('a', 'b', 'o'), "baobab"))
         assertFalse(canBuildFrom(listOf('a', 'm', 'r'), "Marat"))
@@ -321,6 +323,29 @@ class Tests {
     @Test
     @Tag("8")
     fun bagPacking() {
+        assertEquals(
+            setOf("12", "2"),
+            bagPacking(
+                mapOf(
+                    "0" to (1 to 1),
+                    "1" to (1 to 1),
+                    "2" to (1 to 60),
+                    "3" to (1 to 1),
+                    "4" to (1 to 1),
+                    "5" to (1 to 1),
+                    "6" to (1 to 1),
+                    "7" to (1 to 1),
+                    "8" to (1 to 1),
+                    "9" to (1 to 1),
+                    "10" to (1 to 1),
+                    "11" to (1 to 1),
+                    "12" to (1 to 115),
+                    "13" to (2 to 148),
+                    "14" to (1 to 1)
+                ),
+                2
+            )
+        )
         assertEquals(
             setOf("Кубок"),
             bagPacking(
