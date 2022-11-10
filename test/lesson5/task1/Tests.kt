@@ -235,6 +235,7 @@ class Tests {
     fun canBuildFrom() {
         assertTrue(canBuildFrom(emptyList(), ""))
         assertFalse(canBuildFrom(emptyList(), "foo"))
+        assertTrue(canBuildFrom(listOf('a', 'b', 'o', 'x'), "baobab"))
         assertTrue(canBuildFrom(listOf('a', 'b', 'o'), "baobab"))
         assertFalse(canBuildFrom(listOf('a', 'm', 'r'), "Marat"))
     }
@@ -269,6 +270,22 @@ class Tests {
     @Test
     @Tag("5")
     fun propagateHandshakes() {
+        assertEquals(
+            mapOf(
+                "0" to setOf("1"),
+                "1" to setOf(),
+                "2" to setOf("3", "0", "1"),
+                "3" to setOf("0", "1")
+            ),
+            propagateHandshakes(
+                mapOf(
+                    "0" to setOf("1"),
+                    "1" to setOf(),
+                    "2" to setOf("3"),
+                    "3" to setOf("0")
+                )
+            )
+        )
         assertEquals(
             mapOf(
                 "Marat" to setOf("Mikhail", "Sveta"),
@@ -306,6 +323,10 @@ class Tests {
     @Test
     @Tag("6")
     fun findSumOfTwo() {
+        assertEquals(
+            Pair(0, 1),
+            findSumOfTwo(listOf(0, 0), 0)
+        )
         assertEquals(
             Pair(-1, -1),
             findSumOfTwo(emptyList(), 1)

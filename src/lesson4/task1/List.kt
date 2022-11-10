@@ -157,7 +157,7 @@ fun center(list: MutableList<Double>): MutableList<Double> {
  */
 fun times(a: List<Int>, b: List<Int>): Int {
     var s = 0
-    for (i in a.indices) s += a[i] * b[i]
+    a.forEachIndexed { i, _ -> s += a[i] * b[i] }
     return s
 }
 
@@ -320,16 +320,16 @@ fun roman(n: Int): String {
     val divs = listOf(1, 4, 5, 9, 10, 40, 50, 90, 100, 400, 500, 900, 1000)
     var num = n
     var i = divs.size - 1
-    var s = StringBuilder().toString()
+    val s = StringBuilder()
     do {
         if (num / divs[i] > 0) {
-            s += alphabet[i].repeat(num / divs[i])
+            s.append(alphabet[i].repeat(num / divs[i]))
             num %= divs[i]
         } else {
             i--
         }
     } while (num > 0)
-    return s
+    return s.toString()
 }
 
 /**
@@ -340,13 +340,13 @@ fun roman(n: Int): String {
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
 fun russian(n: Int): String {
-    val hundreds = listOf<String>(
+    val hundreds = listOf(
         "сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот"
     )
-    val decimals = listOf<String>(
+    val decimals = listOf(
         "двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят", "семьдесят", "восемьдесят", "девяносто"
     )
-    val elementary = listOf<String>(
+    val elementary = listOf(
         "", "", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять", "десять", "одиннадцать",
         "двенадцать", "тринадцать", "четырнадцать", "пятнадцать", "шестнадцать", "семнадцать", "восемнадцать",
         "девятнадцать", "двадцать"
