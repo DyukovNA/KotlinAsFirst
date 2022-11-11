@@ -2,6 +2,11 @@
 
 package lesson6.task1
 
+import lesson2.task2.daysInMonth
+import java.lang.NullPointerException
+import java.lang.NumberFormatException
+import java.lang.StringBuilder
+
 // Урок 6: разбор строк, исключения
 // Максимальное количество баллов = 13
 // Рекомендуемое количество баллов = 11
@@ -74,7 +79,29 @@ fun main() {
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30.02.2009) считается неверными
  * входными данными.
  */
-fun dateStrToDigit(str: String): String = TODO()
+fun dateStrToDigit(str: String): String {
+    val months = listOf(
+        "января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября",
+        "ноября", "декабря"
+    )
+    try {
+        val date = str.split(" ").toMutableList()
+        val ans = mutableListOf<String>()
+        if (Regex("""[1-9]{1,2} [а-я]+ [0-9]+""").matches(str) && date[1] in months) {
+            date[1] = (months.indexOf(date[1]) + 1).toString()
+            if (date[0].toInt() >= daysInMonth(date[1].toInt(), date[2].toInt())) throw NumberFormatException()
+            date.forEach {
+                ans += (when {
+                    it.toInt() < 10 -> "0$it"
+                    else -> it
+                })
+            }
+            return ans.joinToString(".")
+        } else throw NumberFormatException()
+    } catch (e: NumberFormatException) {
+        return ""
+    }
+}
 
 /**
  * Средняя (4 балла)
@@ -86,7 +113,25 @@ fun dateStrToDigit(str: String): String = TODO()
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30 февраля 2009) считается неверными
  * входными данными.
  */
-fun dateDigitToStr(digital: String): String = TODO()
+fun dateDigitToStr(digital: String): String {
+    val months = listOf(
+        "января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября",
+        "ноября", "декабря"
+    )
+    val date = digital.split(".").toMutableList()
+    val ans = mutableListOf<String>()
+    return try {
+        if (Regex("""[0-9][1-9].[0-9][1-9].[1-9][0-9]+""").matches(digital)) {
+            if (date[1].toInt() > 12) throw NumberFormatException()
+            if (daysInMonth(date[1].toInt(), date[2].toInt()) < date[0].toInt()) throw NumberFormatException()
+            date.forEach { ans += it.toInt().toString() }
+            ans[1] = months[ans[1].toInt() - 1]
+            ans.joinToString(" ")
+        } else throw NumberFormatException()
+    } catch (e: NumberFormatException) {
+        ""
+    }
+}
 
 /**
  * Средняя (4 балла)
@@ -102,7 +147,20 @@ fun dateDigitToStr(digital: String): String = TODO()
  *
  * PS: Дополнительные примеры работы функции можно посмотреть в соответствующих тестах.
  */
-fun flattenPhoneNumber(phone: String): String = TODO()
+fun flattenPhoneNumber(phone: String): String {
+    val str = phone.replace("-", "").replace(" ", "")
+    return try {
+        if (Regex("""[/+]*[1-9]([0-9]+)*[/(]*([1-9]([0-9]+)*)*[/)]*([0-9]+)*""").matches(str)) {
+            if (str.contains("()") ||
+                str.contains("(") and !str.contains(")") ||
+                str.contains(")") and !str.contains("(")
+            ) throw NumberFormatException()
+            str.replace("(", "").replace(")", "")
+        } else throw NumberFormatException()
+    } catch (e: NumberFormatException) {
+        ""
+    }
+}
 
 /**
  * Средняя (5 баллов)
