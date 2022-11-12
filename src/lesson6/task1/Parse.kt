@@ -90,7 +90,7 @@ fun dateStrToDigit(str: String): String {
         val ans = mutableListOf<String>()
         if (Regex("""[0-9]{1,2} [а-я]+ [1-9]([0-9]+)*""").matches(str) && date[1] in months) {
             date[1] = (months.indexOf(date[1]) + 1).toString()
-            if (date[0].toInt() >= daysInMonth(date[1].toInt(), date[2].toInt())) throw NumberFormatException()
+            if (date[0].toInt() > daysInMonth(date[1].toInt(), date[2].toInt())) throw NumberFormatException()
             for (i in 0..1) {
                 val it = date[i].toInt()
                 ans += (when {
