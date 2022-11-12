@@ -162,6 +162,13 @@ class Tests {
     @Tag("3")
     fun mergePhoneBooks() {
         assertEquals(
+            mapOf("" to "m, "),
+            mergePhoneBooks(
+                mapOf("" to "m"),
+                mapOf("" to "")
+            )
+        )
+        assertEquals(
             mapOf("Emergency" to "112"),
             mergePhoneBooks(
                 mapOf("Emergency" to "112"),
@@ -233,6 +240,9 @@ class Tests {
     @Test
     @Tag("3")
     fun canBuildFrom() {
+        assertTrue(canBuildFrom(listOf('a', 'X', 'a'), "x"))
+        assertTrue(canBuildFrom(listOf('a'), ""))
+        assertFalse(canBuildFrom(emptyList(), "qwerty"))
         assertTrue(canBuildFrom(emptyList(), ""))
         assertFalse(canBuildFrom(emptyList(), "foo"))
         assertTrue(canBuildFrom(listOf('a', 'b', 'o', 'x'), "baobab"))

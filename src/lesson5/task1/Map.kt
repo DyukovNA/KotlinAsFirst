@@ -180,8 +180,9 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
     for ((key, value) in mapB) {
         merged[key] = when {
             (key in merged && !(merged[key]!!.contains(value))) -> merged[key] + ", $value"
+            (key in merged && value == "") -> merged[key] + ", "
             key !in merged -> value
-            else -> value
+            else -> mapA[key]!!
         }
     }
     return merged
@@ -245,7 +246,13 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  * Например:
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
-fun canBuildFrom(chars: List<Char>, word: String): Boolean = chars.toSet().containsAll(word.toSet())
+fun canBuildFrom(chars: List<Char>, word: String): Boolean {
+    val alph = mutableSetOf<Char>()
+    chars.forEach { alph += it.toLowerCase() }
+    val letters = mutableSetOf<Char>()
+    word.forEach { letters += it.toLowerCase() }
+    return alph.containsAll(letters)
+}
 
 /**
  * Средняя (4 балла)

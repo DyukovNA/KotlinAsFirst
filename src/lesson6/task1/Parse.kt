@@ -88,14 +88,14 @@ fun dateStrToDigit(str: String): String {
     try {
         val date = str.split(" ").toMutableList()
         val ans = mutableListOf<String>()
-        if (Regex("""[1-9]{1,2} [а-я]+ [1-9]([0-9]+)*""").matches(str) && date[1] in months) {
+        if (Regex("""[0-9]{1,2} [а-я]+ [1-9]([0-9]+)*""").matches(str) && date[1] in months) {
             date[1] = (months.indexOf(date[1]) + 1).toString()
             if (date[0].toInt() >= daysInMonth(date[1].toInt(), date[2].toInt())) throw NumberFormatException()
             for (i in 0..1) {
-                val it = date[i]
+                val it = date[i].toInt()
                 ans += (when {
-                    it.toInt() < 10 -> "0$it"
-                    else -> it
+                    it < 10 -> "0$it"
+                    else -> it.toString()
                 })
             }
             ans += date[2]
