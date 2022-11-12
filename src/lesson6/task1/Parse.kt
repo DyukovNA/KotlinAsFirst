@@ -6,6 +6,7 @@ import lesson2.task2.daysInMonth
 import java.lang.NullPointerException
 import java.lang.NumberFormatException
 import java.lang.StringBuilder
+import kotlin.math.max
 
 // Урок 6: разбор строк, исключения
 // Максимальное количество баллов = 13
@@ -87,15 +88,17 @@ fun dateStrToDigit(str: String): String {
     try {
         val date = str.split(" ").toMutableList()
         val ans = mutableListOf<String>()
-        if (Regex("""[1-9]{1,2} [а-я]+ [0-9]+""").matches(str) && date[1] in months) {
+        if (Regex("""[1-9]{1,2} [а-я]+ [1-9]([0-9]+)*""").matches(str) && date[1] in months) {
             date[1] = (months.indexOf(date[1]) + 1).toString()
             if (date[0].toInt() >= daysInMonth(date[1].toInt(), date[2].toInt())) throw NumberFormatException()
-            date.forEach {
+            for (i in 0..1) {
+                val it = date[i]
                 ans += (when {
                     it.toInt() < 10 -> "0$it"
                     else -> it
                 })
             }
+            ans += date[2]
             return ans.joinToString(".")
         } else throw NumberFormatException()
     } catch (e: NumberFormatException) {
@@ -121,9 +124,10 @@ fun dateDigitToStr(digital: String): String {
     val date = digital.split(".").toMutableList()
     val ans = mutableListOf<String>()
     return try {
-        if (Regex("""[0-9][1-9].[0-9][1-9].[1-9][0-9]+""").matches(digital)) {
-            if (date[1].toInt() > 12) throw NumberFormatException()
-            if (daysInMonth(date[1].toInt(), date[2].toInt()) < date[0].toInt()) throw NumberFormatException()
+        if (Regex("""[0-9]{1,2}.[0-9]{1,2}.[1-9]([0-9]+)*""").matches(digital)
+            && !(date[1].toInt() > 12 || date[1].toInt() < 1)
+            && (daysInMonth(date[1].toInt(), date[2].toInt()) >= date[0].toInt())
+        ) {
             date.forEach { ans += it.toInt().toString() }
             ans[1] = months[ans[1].toInt() - 1]
             ans.joinToString(" ")
@@ -172,7 +176,19 @@ fun flattenPhoneNumber(phone: String): String {
  * Прочитать строку и вернуть максимальное присутствующее в ней число (717 в примере).
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
-fun bestLongJump(jumps: String): Int = TODO()
+fun bestLongJump(jumps: String): Int {
+    val str = jumps.replace("-", "").replace("%", "")
+    return try {
+        if (Regex("""(\s+)*(([1-9]([0-9]+)*(\s+)*))+[1-9]([0-9]+)*(\s+)*""").matches(str)) {
+            val results = str.split(Regex("""\s+"""))
+            var maxRes = Int.MIN_VALUE
+            results.forEach { maxRes = max(maxRes, it.toInt()) }
+            maxRes
+        } else throw NumberFormatException()
+    } catch (e: NumberFormatException) {
+        -1
+    }
+}
 
 /**
  * Сложная (6 баллов)
