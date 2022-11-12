@@ -179,7 +179,7 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
     val merged = mapA.toMutableMap()
     for ((key, value) in mapB) {
         merged[key] = when {
-            (key in merged && !(merged[key]!!.contains(value))) -> merged[key] + ", $value"
+            (key in merged && value !in merged[key]!!.split(", ")) -> merged[key] + ", $value"
             (key in merged && value == "") -> merged[key] + ", "
             key !in merged -> value
             else -> mapA[key]!!
@@ -333,31 +333,31 @@ fun hasAnagrams(words: List<String>): Boolean {
  *        )
  */
 fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> = TODO()
-    /**var prevIteration = friends as MutableMap<String, MutableSet<String>>
-    friends.forEach { (_, shakes) -> shakes.forEach { if (it !in prevIteration) prevIteration += Pair(it, mutableSetOf()) } }
-    var newIteration = prevIteration
-    prevIteration.forEach { (namePrev, shakesPrev) ->
-        shakesPrev.forEach { name ->
-            if (newIteration[namePrev] == null) newIteration[namePrev] = mutableSetOf()
-            else prevIteration[name]!!.forEach { newIteration[namePrev]!!.toMutableSet().add(it) }
-        }
-    }
-    return newIteration
-    //
-    var people = friends
-    friends.forEach { (_, ff) -> ff.forEach { if (!people.contains(it)) people += Pair(it, emptySet()) } }
-    val ans = mutableMapOf<String, MutableSet<String>>()
-    people = people as MutableMap<String, MutableSet<String>>
-    do {
-        val prevIteration = ans
-        for ((name, ff) in people) {
-            val handshakes = ff.toMutableSet()
-            ff.forEach { a -> people.forEach { (b, list) -> if (a == b) list.forEach { if (it != name) handshakes.add(it) } } }
-            ans += Pair(name, handshakes)
-        }
-        people = ans
-    } while (prevIteration != ans)
-    return ans
+/**var prevIteration = friends as MutableMap<String, MutableSet<String>>
+friends.forEach { (_, shakes) -> shakes.forEach { if (it !in prevIteration) prevIteration += Pair(it, mutableSetOf()) } }
+var newIteration = prevIteration
+prevIteration.forEach { (namePrev, shakesPrev) ->
+shakesPrev.forEach { name ->
+if (newIteration[namePrev] == null) newIteration[namePrev] = mutableSetOf()
+else prevIteration[name]!!.forEach { newIteration[namePrev]!!.toMutableSet().add(it) }
+}
+}
+return newIteration
+//
+var people = friends
+friends.forEach { (_, ff) -> ff.forEach { if (!people.contains(it)) people += Pair(it, emptySet()) } }
+val ans = mutableMapOf<String, MutableSet<String>>()
+people = people as MutableMap<String, MutableSet<String>>
+do {
+val prevIteration = ans
+for ((name, ff) in people) {
+val handshakes = ff.toMutableSet()
+ff.forEach { a -> people.forEach { (b, list) -> if (a == b) list.forEach { if (it != name) handshakes.add(it) } } }
+ans += Pair(name, handshakes)
+}
+people = ans
+} while (prevIteration != ans)
+return ans
 }*/
 
 /**
