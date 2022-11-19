@@ -3,6 +3,7 @@
 package lesson6.task1
 
 import lesson2.task2.daysInMonth
+import java.lang.IllegalArgumentException
 import java.lang.NullPointerException
 import java.lang.NumberFormatException
 import java.lang.StringBuilder
@@ -88,19 +89,19 @@ fun dateStrToDigit(str: String): String {
     try {
         val date = str.split(" ").toMutableList()
         val ans = mutableListOf<String>()
-        if (Regex("""[0-9]{1,2} [а-я]+ [1-9]([0-9]+)*""").matches(str) && date[1] in months) {
+        return if (Regex("""[0-9]{1,2} [а-я]+ [1-9]([0-9]+)*""").matches(str) && date[1] in months) {
             date[1] = (months.indexOf(date[1]) + 1).toString()
-            if (date[0].toInt() > daysInMonth(date[1].toInt(), date[2].toInt())) throw NumberFormatException()
+            val day = date[0].toInt()
+            val month = date[1].toInt()
+            val year = date[2].toInt()
+            if (day > daysInMonth(month, year)) return ""
             for (i in 0..1) {
                 val it = date[i].toInt()
-                ans += (when {
-                    it < 10 -> "0$it"
-                    else -> it.toString()
-                })
+                ans += twoDigitStr(it)
             }
             ans += date[2]
-            return ans.joinToString(".")
-        } else throw NumberFormatException()
+            ans.joinToString(".")
+        } else ""
     } catch (e: NumberFormatException) {
         return ""
     }
@@ -124,14 +125,17 @@ fun dateDigitToStr(digital: String): String {
     val date = digital.split(".").toMutableList()
     val ans = mutableListOf<String>()
     return try {
+        val day = date[0].toInt()
+        val month = date[1].toInt()
+        val year = date[2].toInt()
         if (Regex("""[0-9]{1,2}.[0-9]{1,2}.[1-9]([0-9]+)*""").matches(digital)
-            && !(date[1].toInt() > 12 || date[1].toInt() < 1)
-            && (daysInMonth(date[1].toInt(), date[2].toInt()) >= date[0].toInt())
+            && !(month > 12 || month < 1)
+            && (daysInMonth(month, year) >= day)
         ) {
             date.forEach { ans += it.toInt().toString() }
-            ans[1] = months[ans[1].toInt() - 1]
+            ans[1] = months[month - 1]
             ans.joinToString(" ")
-        } else throw NumberFormatException()
+        } else return ""
     } catch (e: NumberFormatException) {
         ""
     }
@@ -154,13 +158,13 @@ fun dateDigitToStr(digital: String): String {
 fun flattenPhoneNumber(phone: String): String {
     val str = phone.replace("-", "").replace(" ", "")
     return try {
-        if (Regex("""[/+]*[1-9]([0-9]+)*[/(]*([1-9]([0-9]+)*)*[/)]*([0-9]+)*""").matches(str)) {
+        if (Regex("""[/+]*[0-9]+[/(]*([0-9]+)*[/)]*([0-9]+)*""").matches(str)) {
             if (str.contains("()") ||
                 str.contains("(") and !str.contains(")") ||
                 str.contains(")") and !str.contains("(")
             ) throw NumberFormatException()
             str.replace("(", "").replace(")", "")
-        } else throw NumberFormatException()
+        } else return ""
     } catch (e: NumberFormatException) {
         ""
     }
@@ -184,7 +188,7 @@ fun bestLongJump(jumps: String): Int {
             var maxRes = Int.MIN_VALUE
             results.forEach { maxRes = max(maxRes, it.toInt()) }
             maxRes
-        } else throw NumberFormatException()
+        } else return -1
     } catch (e: NumberFormatException) {
         -1
     }
@@ -201,7 +205,24 @@ fun bestLongJump(jumps: String): Int {
  * При нарушении формата входной строки, а также в случае отсутствия удачных попыток,
  * вернуть -1.
  */
-fun bestHighJump(jumps: String): Int = TODO()
+fun bestHighJump(jumps: String): Int {
+    val s = listOf(" ", "-", "+", "%")
+    var j = jumps
+    s.forEach { j = j.replace(it, "") }
+    return try {
+        if (Regex("""[1-9]([0-9]+)*""").matches(j)) {
+            j = jumps
+            val results = Regex("""[1-9]([0-9]+)*(\s+)*[/+]""").findAll(jumps).map { it.value }.toList()
+            var maxRes = Int.MIN_VALUE
+            results.forEach {
+                maxRes = max(maxRes, it.replace(Regex("""(\s+)*[/+]"""), "").toInt())
+            }
+            maxRes
+        } else return -1
+    } catch (e: NumberFormatException) {
+        -1
+    }
+}
 
 /**
  * Сложная (6 баллов)
@@ -212,7 +233,19 @@ fun bestHighJump(jumps: String): Int = TODO()
  * Вернуть значение выражения (6 для примера).
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
-fun plusMinus(expression: String): Int = TODO()
+fun plusMinus(expression: String): Int {
+    if (Regex("""[0-9]+(\s+)*([+-](\s+)*[0-9]+(\s+)*)*""").matches(expression)) {
+        var ans = Regex("""^[0-9]+""").find(expression)!!.value.toInt()
+        val numbers = expression.split(" ").toList()
+        for (i in 2 until numbers.size step 2) {
+            when {
+                numbers[i - 1] == "+" -> ans += numbers[i].toInt()
+                numbers[i - 1] == "-" -> ans -= numbers[i].toInt()
+            }
+        }
+        return ans
+    } else throw IllegalArgumentException()
+}
 
 /**
  * Сложная (6 баллов)
@@ -223,7 +256,20 @@ fun plusMinus(expression: String): Int = TODO()
  * Вернуть индекс начала первого повторяющегося слова, или -1, если повторов нет.
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
-fun firstDuplicateIndex(str: String): Int = TODO()
+fun firstDuplicateIndex(str: String): Int {
+    val words = str.split(" ").toList()
+    var len = 0
+    if (words.size > 1) for (i in 0 until words.size - 1) {
+        val wordA = words[i]
+        val wordB = words[i + 1]
+        if (wordA.equals(wordB, ignoreCase = true)) {
+            return len
+        } else {
+            len += 1 + wordA.length
+        }
+    }
+    return -1
+}
 
 /**
  * Сложная (6 баллов)
@@ -236,7 +282,29 @@ fun firstDuplicateIndex(str: String): Int = TODO()
  * или пустую строку при нарушении формата строки.
  * Все цены должны быть больше нуля либо равны нулю.
  */
-fun mostExpensive(description: String): String = TODO()
+fun mostExpensive(description: String): String {
+    try {
+        val str = description.toLowerCase()
+        val pattern = """([а-яё]+ [1-9]([0-9]+)*(.[0-9]+)*)((; [а-яё]+ [1-9]([0-9]+)*(.[0-9]+)*)+)*"""
+        if (Regex(pattern).matches(str)) {
+            val list = str.split("; ")
+            val prices = mutableMapOf<String, Double>()
+            var maxPrice = Double.MIN_VALUE
+            list.forEach {
+                val name = it.split(" ")[0]
+                val price = it.split(" ")[1].toDouble()
+                maxPrice = max(maxPrice, price)
+                prices += Pair(name, price)
+            }
+            prices.forEach {
+                if (it.value == maxPrice) return it.key[0].toString().capitalize() + it.key.substring(1, it.key.length)
+            }
+            return "-1"
+        } else return ""
+    } catch (e: NumberFormatException) {
+        return ""
+    }
+}
 
 /**
  * Сложная (6 баллов)
@@ -249,7 +317,26 @@ fun mostExpensive(description: String): String = TODO()
  *
  * Вернуть -1, если roman не является корректным римским числом
  */
-fun fromRoman(roman: String): Int = TODO()
+fun fromRoman(roman: String): Int {
+    val dict = mapOf(
+        ('M' to 1000), ('D' to 500), ('C' to 100), ('L' to 50), ('X' to 10), ('V' to 5), ('I' to 1),
+    )
+    return try {
+        val pattern = """(M+)*((CM)+)*(D+)*((CD)+)*(C+)*((XC)+)*(L+)*((XL)+)*(X+)*((IX)+)*(V+)*((IV)+)*(I+)*"""
+        if (Regex(pattern).matches(roman)) {
+            var ans = 0
+            for (i in 0 until roman.length - 1) {
+                if (dict[roman[i]]!! < dict[roman[i + 1]]!!) ans -= dict.getValue(roman[i])
+                else ans += dict.getValue(roman[i])
+            }
+            ans + dict.getValue(roman[roman.length - 1])
+        } else {
+            -1
+        }
+    } catch (e: NumberFormatException) {
+        -1
+    }
+}
 
 /**
  * Очень сложная (7 баллов)

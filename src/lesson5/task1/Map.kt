@@ -120,7 +120,7 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")) -> false
  */
 fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean =
-    a.all { (key, value) -> (key in b && b[key] == value) }
+    a.all { (key, value) -> (b[key] == value) }
 
 /**
  * Простая (2 балла)
@@ -137,11 +137,9 @@ fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean =
  *     -> a changes to mutableMapOf() aka becomes empty
  */
 fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>): MutableMap<String, String> {
-    val toRemove = mutableListOf<String>()
-    a.forEach { (key, value) ->
-        if (key in b && b.getValue(key) == value) toRemove.add(key)
+    b.forEach { (key, value) ->
+        if (key in a && a.getValue(key) == value) a.remove(key)
     }
-    toRemove.forEach { key -> a.remove(key) }
     return a
 }
 
@@ -154,7 +152,7 @@ fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>): MutableMa
  */
 fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
     val inBoth = mutableSetOf<String>()
-    a.forEach { name -> if (name in b) inBoth.add(name) }
+    a.map { name -> if (name in b) inBoth.add(name) }
     return inBoth.toList()
 }
 
@@ -247,10 +245,8 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
 fun canBuildFrom(chars: List<Char>, word: String): Boolean {
-    val alph = mutableSetOf<Char>()
-    chars.forEach { alph += it.toLowerCase() }
-    val letters = mutableSetOf<Char>()
-    word.forEach { letters += it.toLowerCase() }
+    val alph = chars.map { it.toLowerCase() }
+    val letters = word.map { it.toLowerCase() }
     return alph.containsAll(letters)
 }
 
@@ -287,15 +283,8 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
 fun hasAnagrams(words: List<String>): Boolean {
-    val sortedWords = words.sortedBy { it.length }.toMutableList()
-    for (i in sortedWords.indices) {
-        for (j in i + 1 until sortedWords.size) {
-            if (sortedWords[i].length == sortedWords[j].length &&
-                sortedWords[i].toList().sorted() == sortedWords[j].toList().sorted()
-            ) return true
-        }
-    }
-    return false
+    val sortedWords = words.map { it.toList().sorted() }
+    return sortedWords.size != sortedWords.toSet().size
 }
 
 /**
@@ -379,14 +368,11 @@ return ans
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     var ans = Pair(-1, -1)
-    for (n in list) {
-        val diff = number - n
-        if (number >= n && list.contains(diff)) {
-            if (diff == n && list.indexOf(n) != list.lastIndexOf(n))
-                ans = Pair(min(list.indexOf(n), list.lastIndexOf(n)), max(list.indexOf(n), list.lastIndexOf(n)))
-            else if (diff != n)
-                ans = Pair(min(list.indexOf(n), list.indexOf(diff)), max(list.indexOf(n), list.indexOf(diff)))
-        }
+    val cum = mutableMapOf<Int, Int>()
+    for (i in list.indices) {
+        val diff = number - list[i]
+        if (cum.contains(diff)) ans = Pair(cum[diff]!!, i)
+        else cum[list[i]] = i
     }
     return ans
 }
