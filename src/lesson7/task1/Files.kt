@@ -63,7 +63,12 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
  * Подчёркивание в середине и/или в конце строк значения не имеет.
  */
 fun deleteMarked(inputName: String, outputName: String) {
-    TODO()
+    val writer = File(outputName).bufferedWriter()
+    File(inputName).bufferedReader().forEachLine {
+        val str = it.replace(" ", "")
+        if (!Regex("""\_+[А-яё]*[\,,\.](\s)*""").matches(str)) writer.write(it + "\n")
+    }
+    writer.close()
 }
 
 /**
@@ -75,8 +80,22 @@ fun deleteMarked(inputName: String, outputName: String) {
  * Регистр букв игнорировать, то есть буквы е и Е считать одинаковыми.
  *
  */
-fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> = TODO()
-
+fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
+    val ans = mutableMapOf<String, Int>()
+    substrings.forEach { ans[it] = 0 }
+    File(inputName).forEachLine { str ->
+        val line = str.toLowerCase()
+        for (i in line.indices) {
+            for (j in i + 1..line.length) {
+                val subStr = line.substring(i, j)
+                for (key in substrings) {
+                    if (key.equals(subStr, ignoreCase = true)) ans[key] = ans[key]!! + 1
+                }
+            }
+        }
+    }
+    return ans
+}
 
 /**
  * Средняя (12 баллов)

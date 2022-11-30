@@ -137,9 +137,7 @@ fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean =
  *     -> a changes to mutableMapOf() aka becomes empty
  */
 fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>): MutableMap<String, String> {
-    b.forEach { (key, value) ->
-        if (key in a && a.getValue(key) == value) a.remove(key)
-    }
+    b.forEach { (key, value) -> if (a[key] == value) a.remove(key) }
     return a
 }
 
@@ -368,11 +366,11 @@ return ans
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     var ans = Pair(-1, -1)
-    val cum = mutableMapOf<Int, Int>()
+    val nums = mutableMapOf<Int, Int>()
     for (i in list.indices) {
         val diff = number - list[i]
-        if (cum.contains(diff)) ans = Pair(cum[diff]!!, i)
-        else cum[list[i]] = i
+        if (diff in nums) ans = Pair(nums[diff]!!, i)
+        else nums[list[i]] = i
     }
     return ans
 }

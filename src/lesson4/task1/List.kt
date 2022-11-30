@@ -404,7 +404,7 @@ fun russian(n: Int): String {
                             s += decimals[a / 10 - 2] + " " + "две "
 
                         (digitNumber(a) == 2) && (a > 20) ->
-                            s += decimals[a / 10 - 2] + " " + elementary[a % 10 + 1] + " "
+                            s += decimals[a / 10 - 2] + " " + elementary[a % 10 + 1]
 
                         (digitNumber(a) == 3) && (a % 100 == 0) -> s += hundreds[a / 100 - 1] + " "
                         (digitNumber(a) == 3) && (a % 100 == 1) -> s += hundreds[a / 100 - 1] + " одна "
