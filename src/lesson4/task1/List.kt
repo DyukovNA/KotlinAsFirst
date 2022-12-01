@@ -340,118 +340,49 @@ fun roman(n: Int): String {
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
 fun russian(n: Int): String {
-    val hundreds = listOf(
-        "сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот"
-    )
-    val decimals = listOf(
-        "двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят", "семьдесят", "восемьдесят", "девяносто"
-    )
+    if (n == 0) return "ноль"
     val elementary = listOf(
-        "", "", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять", "десять", "одиннадцать",
-        "двенадцать", "тринадцать", "четырнадцать", "пятнадцать", "шестнадцать", "семнадцать", "восемнадцать",
-        "девятнадцать", "двадцать"
+        listOf("ноль", "одна", "две", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять"),
+        listOf("ноль", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять")
+    ) //0 - for thousands 1 - for hundreds
+    val hundreds = listOf(
+        "", "сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот"
     )
-
-    var num = n
-    var s = ""
-    var len = num.toString().length
-    return when {
-        num <= 20 -> elementary[num + 1]
-        else -> {
-            var a = 0
-            var i = 0
-            var check = false
-            var isMoreThanThousand = false
-            while (len > 0) {
-                if (num > 1000) {
-                    a = num / 1000
-                    isMoreThanThousand = true
-                } else a = num
-                num %= 1000
-
-                if (len <= 3) {
-                    when {
-                        a == 0 -> s
-                        digitNumber(a) == 1 -> s += elementary[a + 1]
-                        (digitNumber(a) == 2) && (a <= 20) -> s += elementary[a + 1] + " "
-                        (digitNumber(a) == 2) && (a > 20) && (a % 10 != 0) ->
-                            s += decimals[a / 10 - 2] + " " + elementary[a % 10 + 1] + " "
-
-                        (digitNumber(a) == 2) && (a > 20) && (a % 10 == 0) ->
-                            s += decimals[a / 10 - 2] + " "
-
-                        (digitNumber(a) == 3) && (a % 100 <= 20) ->
-                            s += hundreds[a / 100 - 1] + " " + elementary[a % 100 + 1] + " "
-
-                        (digitNumber(a) == 3) && (a % 100 > 20) && (a % 10 != 0) ->
-                            s += hundreds[a / 100 - 1] + " " + decimals[(a % 100) / 10 - 2] + " " +
-                                    elementary[a % 10 + 1] + " "
-
-                        (digitNumber(a) == 3) && (a % 100 > 20) && (a % 10 == 0) ->
-                            s += hundreds[a / 100 - 1] + " " + decimals[(a % 100) / 10 - 2] + " "
-                    }
-                    i++
-                } else {
-                    when {
-                        a == 1 -> s += "одна "
-                        a == 2 -> s += "две "
-                        digitNumber(a) == 1 -> s += elementary[a + 1] + " "
-                        (digitNumber(a) == 2) && (a <= 20) -> s += elementary[a + 1] + " "
-                        (digitNumber(a) == 2) && (a > 20) && (a % 10 == 1) ->
-                            s += decimals[a / 10 - 2] + " " + "одна "
-
-                        (digitNumber(a) == 2) && (a > 20) && (a % 10 == 2) ->
-                            s += decimals[a / 10 - 2] + " " + "две "
-
-                        (digitNumber(a) == 2) && (a > 20) ->
-                            s += decimals[a / 10 - 2] + " " + elementary[a % 10 + 1]
-
-                        (digitNumber(a) == 3) && (a % 100 == 0) -> s += hundreds[a / 100 - 1] + " "
-                        (digitNumber(a) == 3) && (a % 100 == 1) -> s += hundreds[a / 100 - 1] + " одна "
-                        (digitNumber(a) == 3) && (a % 100 == 2) -> s += hundreds[a / 100 - 1] + " две "
-
-                        (digitNumber(a) == 3) && (a % 100 <= 20) ->
-                            s += hundreds[a / 100 - 1] + " " + elementary[a % 100 + 1] + " "
-
-                        (digitNumber(a) == 3) && (a % 100 <= 20) && (a % 10 == 0) ->
-                            s += hundreds[a / 100 - 1] + " "
-
-                        (digitNumber(a) == 3) && (a % 100 > 20) && (a % 10 == 0) ->
-                            s += hundreds[a / 100 - 1] + " " + decimals[(a % 100) / 10 - 2] + " "
-
-                        (digitNumber(a) == 3) && (a % 100 > 20) && (a % 10 == 1) ->
-                            s += hundreds[a / 100 - 1] + " " + decimals[(a % 100) / 10 - 2] + " " +
-                                    "одна "
-
-                        (digitNumber(a) == 3) && (a % 100 > 20) && (a % 10 == 2) ->
-                            s += hundreds[a / 100 - 1] + " " + decimals[(a % 100) / 10 - 2] + " " +
-                                    "две "
-
-                        (digitNumber(a) == 3) && (a % 100 > 20) ->
-                            s += hundreds[a / 100 - 1] + " " + decimals[(a % 100) / 10 - 2] + " " +
-                                    elementary[a % 10 + 1] + " "
-
-                    }
-                    i++
-                    check = true
-                }
-                len -= digitNumber(a)
-                if (check && s != "") {
-                    val end = a % 100
-                    when {
-                        (end <= 20) && (end > 4) -> s += "тысяч "
-                        end % 10 == 1 -> s += "тысяча "
-                        end % 10 in 2..4 -> s += "тысячи "
-                        (end % 10 in 5..10) || (end % 10 == 0) -> s += "тысяч "
-                        //1  тысяча
-                        // 2 3 4 тысячи
-                        // 5678910 тысчяч
-                    }
-                    check = false
-                }
-                if ((i == 2 && isMoreThanThousand) || (i == 1 && !isMoreThanThousand)) break
-            }
-            s.trim()
-        }
+    val decimals10 = listOf(
+        "десять", "одиннадцать", "двенадцать", "тринадцать", "четырнадцать", "пятнадцать", "шестнадцать",
+        "семнадцать", "восемнадцать", "девятнадцать"
+    )
+    val decimals20 = listOf(
+        "двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят", "семьдесят",
+        "восемьдесят", "девяносто"
+    )
+    var threeDigit = n / 1000
+    var h = threeDigit / 100
+    var d = threeDigit / 10 % 10
+    var e = threeDigit % 10
+    val ans = StringBuilder(hundreds[h])
+    if (h > 0) ans.append(" ")
+    when (d) {
+        0 -> if (e != 0) ans.append(elementary[0][e] + " ")
+        1 -> ans.append(decimals10[e] + " ")
+        in 2..9 -> ans.append(decimals20[d - 2] + " " + elementary[0][e] + " ")
     }
+    when {
+        e == 1 -> ans.append("тысяча ")
+        e in 2..4 -> ans.append("тысячи ")
+        e in 5..9 -> ans.append("тысяч ")
+        e == 0 && (h != 0 || d != 0) -> ans.append("тысяч ")
+    }
+    threeDigit = n % 1000
+    h = threeDigit / 100
+    d = threeDigit / 10 % 10
+    e = threeDigit % 10
+    ans.append(hundreds[h])
+    if (h > 0) ans.append(" ")
+    when (d) {
+        0 -> if (e != 0) ans.append(elementary[1][e] + " ")
+        1 -> ans.append(decimals10[e] + " ")
+        in 2..9 -> ans.append(decimals20[d - 2] + " " + elementary[1][e] + " ")
+    }
+    return ans.toString().trim()
 }
