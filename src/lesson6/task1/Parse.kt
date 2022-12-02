@@ -140,7 +140,7 @@ fun dateDigitToStr(digital: String): String {
 fun flattenPhoneNumber(phone: String): String {
     val str = phone.replace("-", "").replace(" ", "")
     return try {
-        if (Regex("""[/+]*\d+[/(]*(\d+)*[/)]*(\d+)*""").matches(str)) {
+        if (Regex("""\+*\d+\(*(\d+)*\)*(\d+)*""").matches(str)) {
             if (str.contains("()") ||
                 str.contains("(") and !str.contains(")") ||
                 str.contains(")") and !str.contains("(")
@@ -257,8 +257,8 @@ fun firstDuplicateIndex(str: String): Int {
  * Все цены должны быть больше нуля либо равны нулю.
  */
 fun mostExpensive(description: String): String {
-    val pattern = """([А-яё]+ \d+(.\d+)*)((; [А-яё]+ \d+(.\d+)*)+)*"""
-    if (Regex(pattern).matches(description)) {
+    val pattern = Regex("""(([А-яё]+)* \d+(.\d+)*)""")
+    if (description.contains(pattern)) {
         val list = description.split("; ")
         val prices = mutableMapOf<String, Double>()
         var maxPrice = -1.0

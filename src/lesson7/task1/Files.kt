@@ -66,7 +66,7 @@ fun deleteMarked(inputName: String, outputName: String) {
     val writer = File(outputName).bufferedWriter()
     File(inputName).bufferedReader().forEachLine {
         val str = it.replace(" ", "")
-        if (!Regex("""\_+[А-яё]*[\,,\.](\s)*""").matches(str)) writer.write(it + "\n")
+        if (str.trim()[0] != '_') writer.write(it + "\n")
     }
     writer.close()
 }
@@ -82,6 +82,7 @@ fun deleteMarked(inputName: String, outputName: String) {
  */
 fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
     val ans = mutableMapOf<String, Int>()
+    //перебирать подстроки той длины что и substring
     substrings.forEach { ans[it] = 0 }
     File(inputName).forEachLine { str ->
         val line = str.toLowerCase()
@@ -111,7 +112,40 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
  *
  */
 fun sibilants(inputName: String, outputName: String) {
-    TODO()
+    val writer = File(outputName).bufferedWriter()
+    val forI = Regex("""[жЖшШ]""")//сделать без регексов
+    val forA = Regex("""[чЧщЩ]""")
+    File(inputName).forEachLine { line ->
+        val str = StringBuilder()
+        for (i in 0 until line.length - 1) {
+            val a = line[i]
+            val b = line[i + 1]
+            when {
+                a.equals(forI) && b.equals('Ы', ignoreCase = true) -> {
+                    var toWrite = "И"
+                    if (!b.isUpperCase()) toWrite = toWrite.toLowerCase()
+                    str.append(a.toString() + toWrite)
+                }
+
+                a.equals(forA) && b.equals('Ю', ignoreCase = true) -> {
+                    var toWrite = "У"
+                    if (!b.isUpperCase()) toWrite = toWrite.toLowerCase()
+                    str.append(a.toString() + toWrite)
+                }
+
+                a.equals(forA) && b.equals('Я', ignoreCase = true) -> {
+                    var toWrite = "А"
+                    if (!b.isUpperCase()) toWrite = toWrite.toLowerCase()
+                    str.append(a.toString() + toWrite)
+                }
+
+                else -> str.append(a.toString())
+            }
+            if (line.contains("\n")) str.append("\n")
+        }
+        writer.write(str.toString())
+    }
+    writer.close()
 }
 
 /**
