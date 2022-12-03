@@ -4,6 +4,7 @@ package lesson7.task1
 
 import ru.spbstu.wheels.out
 import java.io.File
+import java.util.Stack
 import kotlin.math.max
 
 // Урок 7: работа с файлами
@@ -363,8 +364,96 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  *
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
+fun openTag(type: String, str: StringBuilder, tagsToClose: Stack<String>) {
+    when (type) {
+        /**"***" -> {
+            tagsToClose.push("</b></i>")
+            str.append("<b><i>")
+        }*/
+
+        "**" -> {
+            tagsToClose.push("</b>")
+            str.append("<b>")
+        }
+
+        "*" -> {
+            tagsToClose.push("</i>")
+            str.append("<i>")
+        }
+
+        "~~" -> {
+            tagsToClose.push("</s>")
+            str.append("<s>")
+        }
+    }
+}
+
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    TODO()
+    val writer = File(outputName).bufferedWriter()
+    val tagsToClose = Stack<String>()
+    writer.write("<html><body><p>")
+    tagsToClose.addAll(listOf("</html>", "</body>", "</p>"))
+    File(inputName).forEachLine { line ->
+        if (line.isEmpty()) {
+            writer.write(tagsToClose.pop())
+            writer.write("<p>")
+            tagsToClose.push("</p>")
+        } else {
+            val toWrite = StringBuilder()
+            var skip = 0
+            val len = line.length
+            for (i in 0 until len - 2) {
+                val a = line[i]
+                val b = line[i + 1]
+                val c = line[i + 2]
+                when {
+                    skip > 0 -> skip -= 1
+                    a == '*' && b == '*' && c == '*' && (tagsToClose.peek() == "</b>" || tagsToClose.peek() == "</i>") -> {
+                        toWrite.append("</b></i>")
+                        tagsToClose.pop()
+                        tagsToClose.pop()
+                        skip = 2
+                    }
+
+                    a == '*' && b == '*' && c == '*' && (tagsToClose.peek() != "</b>" || tagsToClose.peek() != "</i>") -> {
+                        openTag("**", toWrite, tagsToClose)
+                        openTag("*", toWrite, tagsToClose)
+                    }
+
+                    a == '*' && b == '*' && tagsToClose.peek() != "</b>" -> {
+                        openTag("**", toWrite, tagsToClose)
+                        skip = 1
+                    }
+
+                    a == '*' && b == '*' && tagsToClose.peek() == "</b>" -> {
+                        toWrite.append(tagsToClose.pop())
+                        skip = 1
+                    }
+
+                    a == '*' && tagsToClose.peek() != "</i>" -> openTag("*", toWrite, tagsToClose)
+                    a == '*' && tagsToClose.peek() == "</i>" -> toWrite.append(tagsToClose.pop())
+                    a == '~' && b == '~' && tagsToClose.peek() != "</s>" -> {
+                        openTag("~~", toWrite, tagsToClose)
+                        skip = 1
+                    }
+
+                    a == '~' && b == '~' && tagsToClose.peek() == "</s>" -> {
+                        toWrite.append(tagsToClose.pop())
+                        skip = 1
+                    }
+
+                    else -> toWrite.append(a.toString())
+                }
+            }
+            when (skip) {
+                0 -> toWrite.append(line[len - 2].toString() + line[len - 1].toString())
+                1 -> toWrite.append(line[len - 1].toString())
+            }
+            writer.write(toWrite.toString())
+        }
+    }
+    while (tagsToClose.isNotEmpty()) writer.write(tagsToClose.pop())
+    writer.close()
 }
 
 /**
