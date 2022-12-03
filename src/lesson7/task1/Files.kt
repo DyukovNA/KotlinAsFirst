@@ -65,8 +65,12 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
 fun deleteMarked(inputName: String, outputName: String) {
     val writer = File(outputName).bufferedWriter()
     File(inputName).bufferedReader().forEachLine {
-        val str = it.replace(" ", "")
-        if (str.trim()[0] != '_') writer.write(it + "\n")
+        when {
+            it.isEmpty() -> writer.write(it + "\n")
+            it.trim()[0] != '_' -> writer.write(it + "\n")
+        }
+        //val str = it.replace(" ", "")
+        //if (str.trim()[0] != '_') writer.write(it + "\n")
     }
     writer.close()
 }
@@ -84,9 +88,10 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
     val ans = mutableMapOf<String, Int>()
     //перебирать подстроки той длины что и substring
     substrings.forEach { ans[it] = 0 }
+    val toFind = substrings.toSet()
     File(inputName).forEachLine { str ->
         val line = str.toLowerCase()
-        substrings.forEach {
+        toFind.forEach {
             val stp = it.length
             for (i in 0..line.length - stp) {
                 for (j in i + stp..line.length step stp) {

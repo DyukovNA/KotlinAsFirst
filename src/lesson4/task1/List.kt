@@ -365,7 +365,10 @@ fun russian(n: Int): String {
     when (d) {
         0 -> if (e != 0) ans.append(elementary[0][e] + " ")
         1 -> ans.append(decimals10[e] + " ")
-        in 2..9 -> ans.append(decimals20[d - 2] + " " + elementary[0][e] + " ")
+        in 2..9 -> {
+            ans.append(decimals20[d - 2] + " ")
+            if (e > 0) ans.append(elementary[0][e] + " ")
+        }
     }
     when {
         e == 1 -> ans.append("тысяча ")
@@ -382,7 +385,10 @@ fun russian(n: Int): String {
     when (d) {
         0 -> if (e != 0) ans.append(elementary[1][e] + " ")
         1 -> ans.append(decimals10[e] + " ")
-        in 2..9 -> ans.append(decimals20[d - 2] + " " + elementary[1][e] + " ")
+        in 2..9 -> {
+            ans.append(decimals20[d - 2] + " ")
+            if (e > 0) ans.append(elementary[1][e] + " ")
+        }
     }
     return ans.toString().trim()
 }
