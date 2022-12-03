@@ -71,8 +71,6 @@ fun deleteMarked(inputName: String, outputName: String) {
             it.isEmpty() -> writer.write(it + "\n")
             it.trim()[0] != '_' -> writer.write(it + "\n")
         }
-        //val str = it.replace(" ", "")
-        //if (str.trim()[0] != '_') writer.write(it + "\n")
     }
     writer.close()
 }
@@ -206,7 +204,7 @@ fun alignFileByWidth(inputName: String, outputName: String) {
     File(inputName).forEachLine { maxLength = max(maxLength, it.trim().length) }
     File(inputName).forEachLine {
         val line = it.trim()
-        val words = line.split(" ")
+        val words = line.split(Regex(""" +"""))
         when (val spacesAmount = words.size - 1) {
             0 -> writer.write(line + "\n")
             else -> {
