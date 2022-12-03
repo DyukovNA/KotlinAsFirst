@@ -366,11 +366,6 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  */
 fun openTag(type: String, str: StringBuilder, tagsToClose: Stack<String>) {
     when (type) {
-        /**"***" -> {
-            tagsToClose.push("</b></i>")
-            str.append("<b><i>")
-        }*/
-
         "**" -> {
             tagsToClose.push("</b>")
             str.append("<b>")
@@ -394,7 +389,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     writer.write("<html><body><p>")
     tagsToClose.addAll(listOf("</html>", "</body>", "</p>"))
     File(inputName).forEachLine { line ->
-        if (line.isEmpty()) {
+        if (line.isEmpty() && outputName.isNotEmpty()) {
             writer.write(tagsToClose.pop())
             writer.write("<p>")
             tagsToClose.push("</p>")
