@@ -86,11 +86,12 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
     substrings.forEach { ans[it] = 0 }
     File(inputName).forEachLine { str ->
         val line = str.toLowerCase()
-        for (i in line.indices) {
-            for (j in i + 1..line.length) {
-                val subStr = line.substring(i, j)
-                for (key in substrings) {
-                    if (key.equals(subStr, ignoreCase = true)) ans[key] = ans[key]!! + 1
+        substrings.forEach {
+            val stp = it.length
+            for (i in 0..line.length - stp) {
+                for (j in i + stp..line.length step stp) {
+                    val subStr = line.substring(i, j)
+                    if (it.equals(subStr, ignoreCase = true)) ans[it] = ans[it]!! + 1
                 }
             }
         }
@@ -113,37 +114,20 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
  */
 fun sibilants(inputName: String, outputName: String) {
     val writer = File(outputName).bufferedWriter()
-    val forI = Regex("""[жЖшШ]""")//сделать без регексов
-    val forA = Regex("""[чЧщЩ]""")
+    val letters = listOf('Ж', 'Ч', 'Ш', 'Щ')
+    val corrections = mapOf('Ы' to 'И', 'Я' to 'А', 'Ю' to 'У', 'ы' to 'и', 'я' to 'а', 'ю' to 'у')
     File(inputName).forEachLine { line ->
-        val str = StringBuilder()
-        for (i in 0 until line.length - 1) {
-            val a = line[i]
-            val b = line[i + 1]
-            when {
-                a.equals(forI) && b.equals('Ы', ignoreCase = true) -> {
-                    var toWrite = "И"
-                    if (!b.isUpperCase()) toWrite = toWrite.toLowerCase()
-                    str.append(a.toString() + toWrite)
-                }
-
-                a.equals(forA) && b.equals('Ю', ignoreCase = true) -> {
-                    var toWrite = "У"
-                    if (!b.isUpperCase()) toWrite = toWrite.toLowerCase()
-                    str.append(a.toString() + toWrite)
-                }
-
-                a.equals(forA) && b.equals('Я', ignoreCase = true) -> {
-                    var toWrite = "А"
-                    if (!b.isUpperCase()) toWrite = toWrite.toLowerCase()
-                    str.append(a.toString() + toWrite)
-                }
-
-                else -> str.append(a.toString())
-            }
-            if (line.contains("\n")) str.append("\n")
+        val str = StringBuilder(line[0].toString())
+        for (i in 1 until line.length) {
+            val a = line[i - 1]
+            val b = line[i]
+            if (corrections.any { it.key.equals(b, ignoreCase = true) }) {
+                if (letters.any { it.equals(a, ignoreCase = true) }) str.append(corrections[b])
+                else str.append(b)
+            } else str.append(b)
         }
         writer.write(str.toString())
+        writer.newLine()
     }
     writer.close()
 }

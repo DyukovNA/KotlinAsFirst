@@ -170,12 +170,10 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> = (a.toSet().in
 fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<String, String> {
     val merged = mapA.toMutableMap()
     for ((key, value) in mapB) {
-        merged[key] = when {
-            (key in merged && value !in merged[key]!!.split(", ")) -> merged[key] + ", $value"
-            (key in merged && value == "") -> merged[key] + ", "
-            key !in merged -> value
-            else -> mapA[key]!!
-        }
+        if (key in merged && value != merged[key]) {
+            val toAdd = merged[key] + ", $value"
+            merged[key] = toAdd
+        } else merged[key] = value
     }
     return merged
 }
