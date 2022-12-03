@@ -372,6 +372,7 @@ fun russian(n: Int): String {
     }
     when {
         e == 1 -> ans.append("тысяча ")
+        d == 1 -> ans.append("тысяч ")
         e in 2..4 -> ans.append("тысячи ")
         e in 5..9 -> ans.append("тысяч ")
         e == 0 && (h != 0 || d != 0) -> ans.append("тысяч ")

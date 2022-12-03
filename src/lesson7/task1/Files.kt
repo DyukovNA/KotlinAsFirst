@@ -2,6 +2,7 @@
 
 package lesson7.task1
 
+import ru.spbstu.wheels.out
 import java.io.File
 import kotlin.math.max
 
@@ -158,21 +159,16 @@ fun sibilants(inputName: String, outputName: String) {
 fun centerFile(inputName: String, outputName: String) {
     val writer = File(outputName).bufferedWriter()
     var maxLength = Int.MIN_VALUE
-    File(inputName).forEachLine { line ->
-        maxLength = max(maxLength, line.trim().length)
-    } //5/2=2
+    File(inputName).forEachLine { maxLength = max(maxLength, it.trim().length) }
     File(inputName).forEachLine { line ->
         val toWrite = StringBuilder()
         when (val len = line.trim().length) {
             0 -> toWrite.append(" ".repeat(maxLength / 2) + "\n")
             else -> {
-                val spaceL = (maxLength - len) / 2
-                val spaceR = maxLength - spaceL
-                toWrite.append(" ".repeat(spaceL) + line.trim() + "\n")
+                toWrite.append(" ".repeat((maxLength - len) / 2) + line.trim() + "\n")
             }
         }
         writer.write(toWrite.toString())
-        //writer.newLine()
     }
     writer.close()
 }
@@ -205,7 +201,34 @@ fun centerFile(inputName: String, outputName: String) {
  * 8) Если входной файл удовлетворяет требованиям 1-7, то он должен быть в точности идентичен выходному файлу
  */
 fun alignFileByWidth(inputName: String, outputName: String) {
-    TODO()
+    val writer = File(outputName).bufferedWriter()
+    var maxLength = Int.MIN_VALUE
+    File(inputName).forEachLine { maxLength = max(maxLength, it.trim().length) }
+    File(inputName).forEachLine {
+        val line = it.trim()
+        val words = line.split(" ")
+        when (val spacesAmount = words.size - 1) {
+            0 -> writer.write(line + "\n")
+            else -> {
+                val toWrite = StringBuilder()
+                val diff = maxLength - words.joinToString(separator = "").length
+                val avgSpace = diff / spacesAmount
+                var extraSpace = diff % spacesAmount
+                words.forEach { word ->
+                    when {
+                        extraSpace > 0 -> {
+                            toWrite.append(word + " ".repeat(avgSpace + 1))
+                            extraSpace -= 1
+                        }
+
+                        else -> toWrite.append(word + " ".repeat(avgSpace))
+                    }
+                }
+                writer.write(toWrite.toString().trim() + "\n")
+            }
+        }
+    }
+    writer.close()
 }
 
 /**
