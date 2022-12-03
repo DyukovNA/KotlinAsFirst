@@ -389,14 +389,14 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     writer.write("<html><body><p>")
     tagsToClose.addAll(listOf("</html>", "</body>", "</p>"))
     File(inputName).forEachLine { line ->
+        val len = line.length
         if (line.isEmpty() && outputName.isNotEmpty()) {
             writer.write(tagsToClose.pop())
             writer.write("<p>")
             tagsToClose.push("</p>")
-        } else {
+        } else if (len < 3) writer.write(line) else {
             val toWrite = StringBuilder()
             var skip = 0
-            val len = line.length
             for (i in 0 until len - 2) {
                 val a = line[i]
                 val b = line[i + 1]
