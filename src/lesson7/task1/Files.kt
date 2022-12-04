@@ -388,9 +388,9 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     val tagsToClose = Stack<String>()
     writer.write("<html><body><p>")
     tagsToClose.addAll(listOf("</html>", "</body>", "</p>"))
-    File(inputName).readText().trim().split("\n").forEach { line ->
+    File(inputName).readText().replace(Regex("""\s+"""), "\n").split("\n").forEach { line ->
         val len = line.length
-        if (line.isEmpty() && outputName.isNotEmpty()) {//доделать
+        if (line.isEmpty()) {
             writer.write(tagsToClose.pop())
             writer.write("<p>")
             tagsToClose.push("</p>")
@@ -412,8 +412,16 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                         skip = 1
                     }
 
-                    a == '*' && tagsToClose.peek() != "</i>" -> openTag("*", toWrite, tagsToClose)
-                    a == '*' && tagsToClose.peek() == "</i>" -> toWrite.append(tagsToClose.pop())
+                    a == '*' && b != '*' && tagsToClose.peek() == "</i>" -> {
+                        toWrite.append(tagsToClose.pop())
+                    }
+
+                    a == '*' && b != '*' && tagsToClose.peek() != "</i>" -> {
+                        openTag("*", toWrite, tagsToClose)
+                    }
+
+                    a != '*' && b == '*' -> toWrite.append(a.toString())
+
                     a == '~' && b == '~' && tagsToClose.peek() != "</s>" -> {
                         openTag("~~", toWrite, tagsToClose)
                         skip = 1
@@ -426,11 +434,20 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
 
                     else -> toWrite.append(a.toString())
                 }
+                if (i == len - 1 && skip == 0) {
+                    //toWrite.append(a.toString())
+                    when {
+                        a == '*' && b == '*' && tagsToClose.peek() != "</b>" -> openTag("**", toWrite, tagsToClose)
+                        a == '*' && b == '*' && tagsToClose.peek() == "</b>" -> toWrite.append(tagsToClose.pop())
+                        b == '*' && tagsToClose.peek() != "</i>" -> openTag("*", toWrite, tagsToClose)
+                        b == '*' && tagsToClose.peek() == "</i>" -> toWrite.append(tagsToClose.pop())
+                        a == '~' && b == '~' && tagsToClose.peek() != "</s>" -> openTag("~~", toWrite, tagsToClose)
+                        a == '~' && b == '~' && tagsToClose.peek() == "</s>" -> toWrite.append(tagsToClose.pop())
+                        else -> toWrite.append(b.toString())
+                    }
+                }
             }
-            when (skip) {
-                0 -> writer.write(toWrite.toString() + line[line.length - 1])
-                else -> writer.write(toWrite.toString())
-            }
+            writer.write(toWrite.toString())
         }
     }
     while (tagsToClose.isNotEmpty()) writer.write(tagsToClose.pop())
