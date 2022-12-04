@@ -388,7 +388,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     val tagsToClose = Stack<String>()
     writer.write("<html><body><p>")
     tagsToClose.addAll(listOf("</html>", "</body>", "</p>"))
-    File(inputName).readText().replace(Regex("""\s+"""), "\n").split("\n").forEach { line ->
+    File(inputName).forEachLine { line ->
         val len = line.length
         if (line.isEmpty()) {
             writer.write(tagsToClose.pop())
