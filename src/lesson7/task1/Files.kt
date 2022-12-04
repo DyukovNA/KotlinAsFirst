@@ -390,31 +390,18 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     tagsToClose.addAll(listOf("</html>", "</body>", "</p>"))
     File(inputName).forEachLine { line ->
         val len = line.length
-        if (line.isEmpty() && outputName.isNotEmpty()) {
+        if (line.isEmpty() && outputName.isNotEmpty()) {//доделать
             writer.write(tagsToClose.pop())
             writer.write("<p>")
             tagsToClose.push("</p>")
-        } else if (len < 3) writer.write(line) else {
+        } else {
             val toWrite = StringBuilder()
             var skip = 0
-            for (i in 0 until len - 2) {
-                val a = line[i]
-                val b = line[i + 1]
-                val c = line[i + 2]
+            for (i in 1 until len) {
+                val a = line[i - 1]
+                val b = line[i]
                 when {
                     skip > 0 -> skip -= 1
-                    a == '*' && b == '*' && c == '*' && (tagsToClose.peek() == "</b>" || tagsToClose.peek() == "</i>") -> {
-                        toWrite.append("</b></i>")
-                        tagsToClose.pop()
-                        tagsToClose.pop()
-                        skip = 2
-                    }
-
-                    a == '*' && b == '*' && c == '*' && (tagsToClose.peek() != "</b>" || tagsToClose.peek() != "</i>") -> {
-                        openTag("**", toWrite, tagsToClose)
-                        openTag("*", toWrite, tagsToClose)
-                    }
-
                     a == '*' && b == '*' && tagsToClose.peek() != "</b>" -> {
                         openTag("**", toWrite, tagsToClose)
                         skip = 1
@@ -441,10 +428,9 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                 }
             }
             when (skip) {
-                0 -> toWrite.append(line[len - 2].toString() + line[len - 1].toString())
-                1 -> toWrite.append(line[len - 1].toString())
+                0 -> writer.write(toWrite.toString() + line[line.length - 1])
+                else -> writer.write(toWrite.toString())
             }
-            writer.write(toWrite.toString())
         }
     }
     while (tagsToClose.isNotEmpty()) writer.write(tagsToClose.pop())
