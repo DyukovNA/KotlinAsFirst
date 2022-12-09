@@ -120,17 +120,14 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
  */
 fun sibilants(inputName: String, outputName: String) {
     val writer = File(outputName).bufferedWriter()
-    val letters = listOf('Ж', 'Ч', 'Ш', 'Щ')
+    val letters = listOf('Ж', 'Ч', 'Ш', 'Щ', 'ж', 'ч', 'ш', 'щ')
     val corrections = mapOf('Ы' to 'И', 'Я' to 'А', 'Ю' to 'У', 'ы' to 'и', 'я' to 'а', 'ю' to 'у')
     File(inputName).forEachLine { line ->
         val str = StringBuilder(line[0].toString())
         for (i in 1 until line.length) {
             val a = line[i - 1]
             val b = line[i]
-            if (corrections.any { it.key.equals(b, ignoreCase = true) }) {
-                if (letters.any { it.equals(a, ignoreCase = true) }) str.append(corrections[b])
-                else str.append(b)
-            } else str.append(b)
+            if (b in corrections && a in letters) str.append(corrections[b]) else str.append(b)
         }
         writer.write(str.toString())
         writer.newLine()
@@ -388,14 +385,18 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     val tagsToClose = Stack<String>()
     writer.write("<html><body><p>")
     tagsToClose.addAll(listOf("</html>", "</body>", "</p>"))
+    var isItBeginningOfParagraph = true
     val text = File(inputName).readText().trim()
-    text.split("\n").toSet().forEach { line ->
+    val textByLines = text.split("\n")
+    textByLines.forEach { line ->
         val len = line.length
-        if (line.isEmpty()) {
+        if (line.isEmpty() && !isItBeginningOfParagraph) {
             writer.write(tagsToClose.pop())
             writer.write("<p>")
             tagsToClose.push("</p>")
+            isItBeginningOfParagraph = true
         } else if (len == 1) {
+            isItBeginningOfParagraph = false
             val toWrite = StringBuilder()
             when {
                 line == "*" && tagsToClose.peek() != "</i>" -> openTag("*", toWrite, tagsToClose)
@@ -404,6 +405,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
             }
             writer.write(toWrite.toString())
         } else {
+            isItBeginningOfParagraph = false
             val toWrite = StringBuilder()
             var skip = 0
             for (i in 1 until len) {
@@ -444,7 +446,6 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                     else -> toWrite.append(a.toString())
                 }
                 if (i == len - 1 && skip == 0) {
-                    //toWrite.append(a.toString())
                     when {
                         a == '*' && b == '*' && tagsToClose.peek() != "</b>" -> openTag("**", toWrite, tagsToClose)
                         a == '*' && b == '*' && tagsToClose.peek() == "</b>" -> toWrite.append(tagsToClose.pop())
