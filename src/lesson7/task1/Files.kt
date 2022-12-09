@@ -404,7 +404,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
             }
             writer.write(toWrite.toString())
         } else {
-            flag = false
+            if (line.replace("/t", "").trim().isNotEmpty()) flag = false
             val toWrite = StringBuilder()
             var skip = 0
             for (i in 1 until len) {
