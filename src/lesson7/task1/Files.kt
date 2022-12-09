@@ -384,7 +384,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     val writer = File(outputName).bufferedWriter()
     val tagsToClose = Stack<String>()
     writer.write("<html><body><p>")
-    tagsToClose.addAll(listOf("</html>", "</body>"))
+    tagsToClose.addAll(listOf("</html>", "</body>", "</p>"))
     var flag = true
     val text = File(inputName).readText().trim()
     val textByLines = text.split("\n")
