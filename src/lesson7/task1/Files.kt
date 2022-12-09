@@ -384,19 +384,17 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     val writer = File(outputName).bufferedWriter()
     val tagsToClose = Stack<String>()
     writer.write("<html><body><p>")
-    tagsToClose.addAll(listOf("</html>", "</body>", "</p>"))
-    var isItBeginningOfParagraph = true
+    tagsToClose.addAll(listOf("</html>", "</body>"))
+    var flag = true
     val text = File(inputName).readText().trim()
     val textByLines = text.split("\n")
     textByLines.forEach { line ->
         val len = line.length
-        if (line.isEmpty() && !isItBeginningOfParagraph) {
-            writer.write(tagsToClose.pop())
+        if (line.isEmpty() && !flag) {
             writer.write("<p>")
-            tagsToClose.push("</p>")
-            isItBeginningOfParagraph = true
+            flag = true
         } else if (len == 1) {
-            isItBeginningOfParagraph = false
+            flag = false
             val toWrite = StringBuilder()
             when {
                 line == "*" && tagsToClose.peek() != "</i>" -> openTag("*", toWrite, tagsToClose)
@@ -405,7 +403,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
             }
             writer.write(toWrite.toString())
         } else {
-            isItBeginningOfParagraph = false
+            flag = false
             val toWrite = StringBuilder()
             var skip = 0
             for (i in 1 until len) {
