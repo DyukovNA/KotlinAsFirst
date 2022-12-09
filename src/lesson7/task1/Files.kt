@@ -391,6 +391,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     textByLines.forEach { line ->
         val len = line.length
         if (line.isEmpty() && !flag) {
+            writer.write("</p>")
             writer.write("<p>")
             flag = true
         } else if (len == 1) {
