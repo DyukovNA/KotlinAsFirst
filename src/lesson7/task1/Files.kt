@@ -390,7 +390,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     val textByLines = text.split("\n")
     textByLines.forEach { line ->
         val len = line.length
-        if (line.replace(Regex("""[\t\s]"""), "").trim().isEmpty() && !flag) {
+        if (line.isEmpty() && !flag) {
             writer.write("</p>")
             writer.write("<p>")
             flag = true
@@ -404,7 +404,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
             }
             writer.write(toWrite.toString())
         } else {
-            if (line.replace(Regex("""[\t\s]"""), "").trim().isNotEmpty()) flag = false
+            if (line.isNotEmpty()) flag = false
             val toWrite = StringBuilder()
             var skip = 0
             for (i in 1 until len) {
