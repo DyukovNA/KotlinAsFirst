@@ -395,7 +395,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
             writer.write("<p>")
             flag = true
         } else if (len == 1) {
-            if (line.isNotEmpty()) flag = false
+            if (line.trim().isNotEmpty()) flag = false
             val toWrite = StringBuilder()
             when {
                 line == "*" && tagsToClose.peek() != "</i>" -> openTag("*", toWrite, tagsToClose)
@@ -404,7 +404,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
             }
             writer.write(toWrite.toString())
         } else {
-            if (line.isNotEmpty()) flag = false
+            if (line.trim().isNotEmpty()) flag = false
             val toWrite = StringBuilder()
             var skip = 0
             for (i in 1 until len) {
