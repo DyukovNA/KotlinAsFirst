@@ -87,19 +87,19 @@ fun deleteMarked(inputName: String, outputName: String) {
  */
 fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
     val ans = mutableMapOf<String, Int>()
-    //перебирать подстроки той длины что и substring
     substrings.forEach { ans[it] = 0 }
-    val toFind = substrings.toSet()
-    File(inputName).forEachLine { str ->
-        val line = str.toLowerCase()
-        toFind.forEach {
-            val stp = it.length
-            for (i in 0..line.length - stp) {
-                for (j in i + stp..line.length step stp) {
-                    val subStr = line.substring(i, j)
-                    if (it.equals(subStr, ignoreCase = true)) ans[it] = ans[it]!! + 1
-                }
+    File(inputName).forEachLine {
+        val line = it.toLowerCase()
+        substrings.forEach { str ->
+            val subStr = str.toLowerCase()
+            var index = 0
+            var count = 0
+            while (line.indexOf(subStr, index) != -1) {
+                index = line.indexOf(subStr, index)
+                count++
+                index++
             }
+            ans[str] = ans[str]!! + count
         }
     }
     return ans
@@ -120,7 +120,7 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
  */
 fun sibilants(inputName: String, outputName: String) {
     val writer = File(outputName).bufferedWriter()
-    val letters = listOf('Ж', 'Ч', 'Ш', 'Щ', 'ж', 'ч', 'ш', 'щ')
+    val letters = setOf('Ж', 'Ч', 'Ш', 'Щ', 'ж', 'ч', 'ш', 'щ')
     val corrections = mapOf('Ы' to 'И', 'Я' to 'А', 'Ю' to 'У', 'ы' to 'и', 'я' to 'а', 'ю' to 'у')
     File(inputName).forEachLine { line ->
         val str = StringBuilder(line[0].toString())
