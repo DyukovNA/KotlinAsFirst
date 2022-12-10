@@ -390,7 +390,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     val textByLines = text.split("\n")
     textByLines.forEach { line ->
         val len = line.length
-        if (line.replace("/t", "").trim().isEmpty() && !flag) {
+        if (line.replace(Regex("""[\t\s]"""), "").trim().isEmpty() && !flag) {
             writer.write("</p>")
             writer.write("<p>")
             flag = true
@@ -404,7 +404,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
             }
             writer.write(toWrite.toString())
         } else {
-            if (line.replace("/t", "").trim().isNotEmpty()) flag = false
+            if (line.replace(Regex("""[\t\s]"""), "").trim().isNotEmpty()) flag = false
             val toWrite = StringBuilder()
             var skip = 0
             for (i in 1 until len) {
@@ -560,31 +560,6 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
-/*
-* - <ul>
-    <li></li>
-    </ul>
-\d- <ol></ol>
-* Can begin with: *, /d, spaces(less than 4; more than 4), other symbols
-*/
-fun beginList(line: String, tagsToClose: Stack<String>, toWrite: StringBuilder) {
-    if (line.startsWith("*")) {
-        if ("</ul>" != tagsToClose.peek()) {
-            toWrite.append("<ul>")
-            tagsToClose.push("</ul>")
-            toWrite.append("<li>" + line.removePrefix("*").trimStart() + "</li>")
-        } else toWrite.append("<li>" + line.removePrefix("*").trimStart() + "</li>")
-    } else if (Regex("""\d""").matches(line[0].toString())) {
-        var index = 0
-        while (Regex("""[\d\s.]""").matches(line[index].toString())) index++
-        if ("</ol>" != tagsToClose.peek()) {
-            toWrite.append("<ol>")
-            tagsToClose.push("</ol>")
-            toWrite.append("<li>" + line.substring(index) + "</li>")
-        } else toWrite.append("<li>" + line.substring(index) + "</li>")
-    }
-}
-
 fun markdownToHtmlLists(inputName: String, outputName: String) {
     val writer = File(outputName).bufferedWriter()
     val tagsToClose = Stack<String>()
