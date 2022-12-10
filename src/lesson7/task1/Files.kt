@@ -390,12 +390,12 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     val textByLines = text.split("\n")
     textByLines.forEach { line ->
         val len = line.length
-        if (line.isEmpty() && !flag) {
+        if (line.trim().isEmpty() && !flag) {
             writer.write("</p>")
             writer.write("<p>")
             flag = true
         } else if (len == 1) {
-            flag = false
+            if (line.isNotEmpty()) flag = false
             val toWrite = StringBuilder()
             when {
                 line == "*" && tagsToClose.peek() != "</i>" -> openTag("*", toWrite, tagsToClose)
