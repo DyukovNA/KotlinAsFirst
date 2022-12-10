@@ -560,8 +560,68 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
+/*
+* - <ul>
+    <li></li>
+    </ul>
+\d- <ol></ol>
+* Can begin with: *, /d, spaces(less than 4; more than 4), other symbols
+*/
+fun beginList(line: String, tagsToClose: Stack<String>, toWrite: StringBuilder) {
+    if (line.startsWith("*")) {
+        if ("</ul>" != tagsToClose.peek()) {
+            toWrite.append("<ul>")
+            tagsToClose.push("</ul>")
+            toWrite.append("<li>" + line.removePrefix("*").trimStart() + "</li>")
+        } else toWrite.append("<li>" + line.removePrefix("*").trimStart() + "</li>")
+    } else if (Regex("""\d""").matches(line[0].toString())) {
+        var index = 0
+        while (Regex("""[\d\s.]""").matches(line[index].toString())) index++
+        if ("</ol>" != tagsToClose.peek()) {
+            toWrite.append("<ol>")
+            tagsToClose.push("</ol>")
+            toWrite.append("<li>" + line.substring(index) + "</li>")
+        } else toWrite.append("<li>" + line.substring(index) + "</li>")
+    }
+}
+
 fun markdownToHtmlLists(inputName: String, outputName: String) {
-    TODO()
+    val writer = File(outputName).bufferedWriter()
+    val tagsToClose = Stack<String>()
+    writer.write("<html><body><p>")
+    tagsToClose.addAll(listOf("</html>", "</body>", "</p>"))
+    var prevTabs = 0
+    var isBeginning = true
+    File(inputName).forEachLine { line ->
+        val toWrite = StringBuilder()
+        val spaces = line.length - line.trimStart().length
+        val tabs = spaces / 4
+        var index = 0
+        while (Regex("""[*\d\s.]""").matches(line[index].toString())) index++
+        if (isBeginning || tabs > prevTabs) {
+            if (line.trimStart().startsWith("*")) {
+                toWrite.append("<ul><li>" + line.substring(index))
+                tagsToClose.addAll(listOf("</ul>", "</li>"))
+            } else {
+                toWrite.append("<ol><li>" + line.substring(index))
+                tagsToClose.addAll(listOf("</ol>", "</li>"))
+            }
+            isBeginning = false
+        } else {
+            if (tabs == prevTabs) {
+                toWrite.append(tagsToClose.pop() + "<li>" + line.substring(index))
+                tagsToClose.push("</li>")
+            } else {
+                for (i in 1..prevTabs - tabs + 1) toWrite.append(tagsToClose.pop())
+                toWrite.append(tagsToClose.pop() + "<li>" + line.substring(index))
+                tagsToClose.push("</li>")
+            }
+        }
+        writer.write(toWrite.toString())
+        prevTabs = tabs
+    }
+    while (tagsToClose.isNotEmpty()) writer.write(tagsToClose.pop())
+    writer.close()
 }
 
 /**
