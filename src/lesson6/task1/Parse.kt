@@ -86,17 +86,15 @@ fun dateStrToDigit(str: String): String {
         "ноября", "декабря"
     )
     val date = str.split(" ").toMutableList()
-    return if (!Regex("""\d+ [А-я]+ \d+""").matches(str)) ""
-    else {
-        var day = date[0]
-        var month = (months.indexOf(date[1]) + 1).toString()
-        val year = date[2].toInt()
-        if (date[1] in months && day.toInt() <= daysInMonth(month.toInt(), year)) {
-            day = twoDigitStr(day.toInt())
-            month = twoDigitStr(month.toInt())
-            "$day.$month.$year"
-        } else ""
-    }
+    if (!Regex("""\d+ [А-я]+ \d+""").matches(str)) return ""
+    var day = date[0]
+    var month = (months.indexOf(date[1]) + 1).toString()
+    val year = date[2].toInt()
+    return if (date[1] in months && day.toInt() <= daysInMonth(month.toInt(), year)) {
+        day = twoDigitStr(day.toInt())
+        month = twoDigitStr(month.toInt())
+        "$day.$month.$year"
+    } else ""
 }
 
 
@@ -116,15 +114,13 @@ fun dateDigitToStr(digital: String): String {
         "ноября", "декабря"
     )
     val date = digital.split(".")
-    return if (!Regex("""\d+.\d+.\d+""").matches(digital)) return ""
-    else {
-        val day = date[0].toInt()
-        val month = date[1].toInt()
-        val year = date[2].toInt()
-        if (!(month > 12 || month < 1) && (daysInMonth(month, year) >= day)) {
-            StringBuilder("$day " + months[month - 1] + " $year").toString()
-        } else ""
-    }
+    if (!Regex("""\d+.\d+.\d+""").matches(digital)) return ""
+    val day = date[0].toInt()
+    val month = date[1].toInt()
+    val year = date[2].toInt()
+    return if (!(month > 12 || month < 1) && (daysInMonth(month, year) >= day)) {
+        "$day ${months[month - 1]} $year"
+    } else ""
 }
 
 /**
@@ -143,10 +139,8 @@ fun dateDigitToStr(digital: String): String {
  */
 fun flattenPhoneNumber(phone: String): String {
     val str = phone.replace("-", "").replace(" ", "")
-    return if (!Regex("""\+?\d*(\(\d+\))?\d+""").matches(str)) ""
-    else {
-        str.replace("(", "").replace(")", "")
-    }
+    if (!Regex("""\+?\d*(\(\d+\))?\d+""").matches(str)) return ""
+    return str.replace("(", "").replace(")", "")
 }
 
 /**
@@ -161,13 +155,11 @@ fun flattenPhoneNumber(phone: String): String {
  */
 fun bestLongJump(jumps: String): Int {
     val str = jumps.replace("-", "").replace("%", "").trim()
-    return if (!Regex("""(\d+( +)*)+""").matches(str)) -1
-    else {
-        val results = str.split(Regex(""" +"""))
-        var maxRes = Int.MIN_VALUE
-        results.forEach { maxRes = max(maxRes, it.toInt()) }
-        maxRes
-    }
+    if (!Regex("""(\d+( +)*)+""").matches(str)) return -1
+    val results = str.split(Regex(""" +"""))
+    var maxRes = Int.MIN_VALUE
+    results.forEach { maxRes = max(maxRes, it.toInt()) }
+    return maxRes
 }
 
 /**
@@ -185,16 +177,14 @@ fun bestHighJump(jumps: String): Int {
     val s = listOf(" ", "-", "+", "%")
     var j = jumps
     s.forEach { j = j.replace(it, "") }
-    return if (!Regex("""\d+""").matches(j)) -1
-    else {
-        j = jumps
-        val results = Regex("""\d+( +)*[/+]""").findAll(jumps).map { it.value }.toList()
-        var maxRes = Int.MIN_VALUE
-        results.forEach {
-            maxRes = max(maxRes, it.replace(Regex("""( +)*[/+]"""), "").toInt())
-        }
-        maxRes
+    if (!Regex("""\d+""").matches(j)) return -1
+    j = jumps
+    val results = Regex("""\d+( +)*[/+]""").findAll(jumps).map { it.value }.toList()
+    var maxRes = Int.MIN_VALUE
+    results.forEach {
+        maxRes = max(maxRes, it.replace(Regex("""( +)*[/+]"""), "").toInt())
     }
+    return maxRes
 }
 
 /**
@@ -208,17 +198,15 @@ fun bestHighJump(jumps: String): Int {
  */
 fun plusMinus(expression: String): Int {
     if (!Regex("""\d+( [+-] \d+)*""").matches(expression)) throw IllegalArgumentException()
-    else {
-        var ans = Regex("""^[0-9]+""").find(expression)!!.value.toInt()
-        val numbers = expression.split(" ").toList()
-        for (i in 2 until numbers.size step 2) {
-            when {
-                numbers[i - 1] == "+" -> ans += numbers[i].toInt()
-                numbers[i - 1] == "-" -> ans -= numbers[i].toInt()
-            }
+    var ans = Regex("""^[0-9]+""").find(expression)!!.value.toInt()
+    val numbers = expression.split(" ").toList()
+    for (i in 2 until numbers.size step 2) {
+        when {
+            numbers[i - 1] == "+" -> ans += numbers[i].toInt()
+            numbers[i - 1] == "-" -> ans -= numbers[i].toInt()
         }
-        return ans
     }
+    return ans
 }
 
 /**
@@ -259,20 +247,18 @@ fun firstDuplicateIndex(str: String): Int {
 fun mostExpensive(description: String): String {
     val pattern = Regex("""(([А-яё]+)* \d+(.\d+)*)""")
     if (!description.contains(pattern)) return ""
-    else {
-        val list = description.split("; ")
-        val prices = mutableMapOf<String, Double>()
-        var maxPrice = -1.0
-        list.forEach {
-            val (name, price) = it.split(" ")
-            maxPrice = max(maxPrice, price.toDouble())
-            prices += Pair(name, price.toDouble())
-        }
-        prices.forEach {
-            if (it.value == maxPrice) return it.key
-        }
-        return ""
+    val list = description.split("; ")
+    val prices = mutableMapOf<String, Double>()
+    var maxPrice = -1.0
+    list.forEach {
+        val (name, price) = it.split(" ")
+        maxPrice = max(maxPrice, price.toDouble())
+        prices += Pair(name, price.toDouble())
     }
+    prices.forEach {
+        if (it.value == maxPrice) return it.key
+    }
+    return ""
 }
 
 /**
@@ -287,9 +273,7 @@ fun mostExpensive(description: String): String {
  * Вернуть -1, если roman не является корректным римским числом
  */
 fun fromRoman(roman: String): Int {
-    val dict = mapOf(
-        ('M' to 1000), ('D' to 500), ('C' to 100), ('L' to 50), ('X' to 10), ('V' to 5), ('I' to 1),
-    )
+    val dict = mapOf('M' to 1000, 'D' to 500, 'C' to 100, 'L' to 50, 'X' to 10, 'V' to 5, 'I' to 1)
     return try {
         val pattern = """(M+)*((CM)+)*(D+)*((CD)+)*(C+)*((XC)+)*(L+)*((XL)+)*(X+)*((IX)+)*(V+)*((IV)+)*(I+)*"""
         if (Regex(pattern).matches(roman) && roman.isNotEmpty()) {
